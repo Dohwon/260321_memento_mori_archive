@@ -1639,6 +1639,7 @@ function closeAuthModal() {
 function openReaderModal(entry) {
   if (!entry) return;
   renderReaderModal(entry);
+  readerModal.body.scrollTop = 0;
   readerModal.shell.classList.remove("is-hidden");
   readerModal.shell.setAttribute("aria-hidden", "false");
   fetchCommentsInto(readerModal).catch(() => {
