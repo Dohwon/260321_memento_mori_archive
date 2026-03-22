@@ -249,7 +249,7 @@ strong.brand-title {
 
 .overlay-map-shell {
   position: relative;
-  min-height: 620px;
+  min-height: 640px;
   padding: 20px 24px 16px;
   overflow: hidden;
   display: grid;
@@ -276,11 +276,10 @@ strong.brand-title {
 }
 
 .atelier-map {
-  min-height: 500px;
+  min-height: 540px;
   border-radius: 24px;
   background:
-    radial-gradient(circle at 50% 24%, rgba(92, 97, 77, 0.16), transparent 28%),
-    radial-gradient(circle at 50% 34%, rgba(233, 220, 171, 0.18), transparent 48%),
+    radial-gradient(circle at 50% 28%, rgba(92, 97, 77, 0.08), transparent 28%),
     linear-gradient(180deg, rgba(255, 253, 247, 0.98), rgba(247, 239, 209, 0.9));
   border: 1px solid rgba(130, 123, 85, 0.2);
 }
@@ -297,6 +296,12 @@ strong.brand-title {
   border: 1px solid rgba(130, 123, 85, 0.24);
   box-shadow: 0 14px 28px rgba(92, 97, 77, 0.12);
   z-index: 2;
+}
+
+.map-profile-badge {
+  position: absolute;
+  top: 22px;
+  left: 26px;
 }
 
 .map-core-floating::after {
@@ -331,65 +336,6 @@ strong.brand-title {
   0% { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.36), 0 0 0 0 rgba(123, 110, 133, 0.12); }
   70% { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.36), 0 0 0 22px rgba(123, 110, 133, 0); }
   100% { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.36), 0 0 0 0 rgba(123, 110, 133, 0); }
-}
-
-.satellite-orb {
-  position: absolute;
-  display: grid;
-  gap: 2px;
-  align-content: center;
-  justify-items: start;
-  border-radius: 14px;
-  background: rgba(255, 253, 252, 0.96);
-  box-shadow: var(--shadow);
-  color: var(--ink);
-  font-family: var(--body);
-  font-size: 0.76rem;
-  z-index: 2;
-  border: 1px solid rgba(130, 123, 85, 0.18);
-  padding: 10px 12px;
-}
-
-.satellite-orb small {
-  font-size: 0.62rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.satellite-orb strong {
-  font-size: 0.82rem;
-  line-height: 1.25;
-  font-family: var(--headline);
-}
-
-.sat-virtue {
-  top: 72px;
-  left: 88px;
-  width: 136px;
-  min-height: 66px;
-}
-
-.sat-control {
-  top: 74px;
-  right: 48px;
-  width: 210px;
-  min-height: 72px;
-}
-
-.sat-apatheia {
-  right: 190px;
-  top: 262px;
-  width: 140px;
-  min-height: 66px;
-}
-
-.sat-logos {
-  left: 82px;
-  top: 258px;
-  width: 120px;
-  min-height: 66px;
 }
 
 .overlay-tabs-shell {
@@ -1430,20 +1376,9 @@ strong.brand-title {
 .map-lines circle,
 .map-lines line {
   fill: none;
-  stroke: rgba(68, 83, 122, 0.26);
-  stroke-width: 1.5;
-}
-
-.map-lines circle {
-  stroke: rgba(123, 110, 133, 0.18);
-}
-
-.map-lines line {
-  stroke: rgba(47, 72, 88, 0.22);
-}
-
-.map-lines path {
-  stroke-dasharray: 6 8;
+  stroke: rgba(130, 123, 85, 0.42);
+  stroke-width: 1.4;
+  stroke-dasharray: 5 6;
 }
 
 .map-node {
@@ -1479,6 +1414,23 @@ strong.brand-title {
 .overlay-record-map {
   position: absolute;
   inset: 0;
+  z-index: 4;
+}
+
+.map-core-watermark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--headline);
+  font-style: italic;
+  font-weight: 700;
+  font-size: clamp(2.4rem, 4vw, 4rem);
+  letter-spacing: 0.02em;
+  color: rgba(92, 97, 77, 0.08);
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
 }
 
 .record-node-dot {
@@ -1489,17 +1441,17 @@ strong.brand-title {
 
 .record-node-point {
   display: block;
-  width: 12px;
-  height: 12px;
+  width: 11px;
+  height: 11px;
   border-radius: 999px;
-  background: var(--deep-700);
-  box-shadow: 0 0 0 6px rgba(47, 72, 88, 0.12);
+  background: var(--primary);
+  box-shadow: 0 0 0 5px rgba(92, 97, 77, 0.14);
 }
 
 .record-node-dot.is-current .record-node-point {
-  width: 16px;
-  height: 16px;
-  box-shadow: 0 0 0 10px rgba(47, 72, 88, 0.16);
+  width: 15px;
+  height: 15px;
+  box-shadow: 0 0 0 10px rgba(92, 97, 77, 0.1);
 }
 
 .record-node-tooltip {
@@ -1559,16 +1511,18 @@ strong.brand-title {
 
 .axis-label {
   position: absolute;
-  font-size: 0.8rem;
+  font-size: 0.74rem;
   font-weight: 700;
   color: var(--muted);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  z-index: 3;
 }
 
-.axis-x-left { left: 28px; top: 33%; transform: translateY(-50%); }
-.axis-x-right { right: 28px; top: 33%; transform: translateY(-50%); text-align: right; }
-.axis-y-top { top: 20px; left: 50%; transform: translateX(-50%); }
-.axis-y-bottom { bottom: 32px; left: 50%; transform: translateX(-50%); }
+.axis-x-left { left: 18px; top: 48%; transform: translateY(-50%); max-width: 110px; }
+.axis-x-right { right: 18px; top: 48%; transform: translateY(-50%); text-align: right; max-width: 110px; }
+.axis-y-top { top: 16px; left: 50%; transform: translateX(-50%); }
+.axis-y-bottom { bottom: 16px; left: 50%; transform: translateX(-50%); }
 
 .map-legend {
   position: absolute;
@@ -2151,6 +2105,13 @@ strong.brand-title {
   .overlay-map-shell,
   .atelier-map {
     min-height: 620px;
+  }
+
+  .map-profile-badge {
+    position: relative;
+    top: 0;
+    left: 0;
+    margin-bottom: 6px;
   }
 
   .overlay-tabs-shell {

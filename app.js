@@ -118,6 +118,7 @@ const authModal = {
 
 const mapCenterTitle = document.getElementById("mapCenterTitle");
 const mapCenterText = document.getElementById("mapCenterText");
+const mapCoreWatermark = document.getElementById("mapCoreWatermark");
 const recentUpdateText = document.getElementById("recentUpdateText");
 const anniversaryCard = document.getElementById("anniversaryCard");
 const anniversaryTitle = document.getElementById("anniversaryTitle");
@@ -1301,8 +1302,11 @@ function renderCognitiveLibrary() {
 
 function updateMap(entry) {
   const philosopher = philosopherCatalog[entry.philosophyKey];
-  mapCenterTitle.textContent = `${philosopher.name} 쪽으로 기운 현재 중심`;
-  mapCenterText.textContent = `${entry.tags.slice(0, 2).join(" · ")}에 오래 머무는 중`;
+  mapCenterTitle.textContent = `${philosopher.name}형 닮은꼴`;
+  mapCenterText.textContent = `핵심 좌표: ${entry.tags.slice(0, 2).join(" · ")}`;
+  if (mapCoreWatermark) {
+    mapCoreWatermark.textContent = philosopher.name;
+  }
   if (overlayFocusTitle) {
     overlayFocusTitle.textContent = philosopher.name;
   }
