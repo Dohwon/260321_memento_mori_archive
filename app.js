@@ -22,6 +22,21 @@ const overlayFocusTitle = document.getElementById("overlayFocusTitle");
 const overlayKeyNodes = document.getElementById("overlayKeyNodes");
 const overlayQuote = document.getElementById("overlayQuote");
 const overlayQuoteAuthor = document.getElementById("overlayQuoteAuthor");
+const philoMbti = {
+  prompt: document.getElementById("philoMbtiPrompt"),
+  progress: document.getElementById("philoMbtiProgress"),
+  optionA: document.getElementById("philoOptionA"),
+  optionB: document.getElementById("philoOptionB"),
+  resultImage: document.getElementById("philoResultImage"),
+  resultName: document.getElementById("philoResultName"),
+  resultMeta: document.getElementById("philoResultMeta"),
+  resultQuote: document.getElementById("philoResultQuote"),
+  checklist: document.getElementById("philoChecklist"),
+  dislikeChecklist: document.getElementById("philoDislikeChecklist"),
+  detailTitle: document.getElementById("philoDetailTitle"),
+  detailPanel: document.getElementById("philoDetailPanel"),
+  restartButton: document.getElementById("philoRestartButton")
+};
 
 const spotlight = {
   image: document.getElementById("spotlightImage"),
@@ -144,6 +159,9 @@ let editingEntryId = "";
 let currentPage = 1;
 const PAGE_SIZE = 4;
 let pendingPostAuthAction = null;
+let philosophyMbtiState = null;
+let activePhilosophyConceptId = "";
+const selectedPhilosophyDislikes = new Set();
 
 const philosopherCatalog = {
   camus: {
@@ -207,6 +225,521 @@ const philosopherCatalog = {
     image: "./assets/philosophers/sartre.svg"
   }
 };
+
+const PHILOSOPHY_MBTI_POOL = [
+  {
+    id: "epictetus",
+    name: "에픽테토스",
+    school: "스토아",
+    angle: "통제 가능한 것에 집중해 소모를 줄인다.",
+    quote: "사건이 아니라 해석이 우리를 흔든다.",
+    image: "./assets/philosophers/epictetus.svg",
+    concepts: [
+      {
+        id: "control-split",
+        title: "통제 구분 훈련",
+        summary: "내 영향권과 비영향권을 분리한다.",
+        benefit: "불안의 범위를 좁혀 행동 가능한 다음 한 걸음을 빠르게 잡을 수 있습니다.",
+        shadow: "지나치면 감정 표현을 억누르는 자기검열로 기울 수 있습니다.",
+        recovery: "에픽테토스는 감정 자체를 부정하지 않고, 반응의 선택권을 늦게라도 회수하라고 권합니다.",
+        alternative: "감정 억제가 심하면 사르트르처럼 감정의 의미를 먼저 인정하고 책임을 다시 고르는 접근이 보완이 됩니다."
+      },
+      {
+        id: "daily-discipline",
+        title: "일일 훈련 루틴",
+        summary: "작은 반복으로 태도를 안정화한다.",
+        benefit: "상황이 흔들려도 기준 리듬이 있어 회복 속도가 빨라집니다.",
+        shadow: "루틴이 무너지면 자기비난이 크게 올라올 수 있습니다.",
+        recovery: "스토아 전통은 완벽보다 복귀를 중시합니다. 실패한 날은 기록하고 다음 회차를 시작하면 됩니다.",
+        alternative: "복귀가 어렵다면 듀이처럼 실험 단위를 더 작게 쪼개는 방법이 현실적입니다."
+      }
+    ],
+    dislikes: [
+      {
+        id: "too-cold",
+        label: "너무 차갑고 무감각해 보여요",
+        response: "원전의 스토아는 감정 제거가 아니라 감정의 방향 조정에 가깝습니다.",
+        alt: "사르트르: 감정을 먼저 인정하고, 그 다음 책임 있게 행동을 고른다."
+      },
+      {
+        id: "self-blame",
+        label: "결국 다 내 책임처럼 느껴져요",
+        response: "에픽테토스는 결과 책임이 아니라 태도 책임을 말합니다. 외부 결과까지 내 탓으로 보진 않습니다.",
+        alt: "한나 아렌트: 개인 책임과 구조적 조건을 분리해 본다."
+      }
+    ]
+  },
+  {
+    id: "seneca",
+    name: "세네카",
+    school: "스토아",
+    angle: "감정 폭주를 문장화해 제어한다.",
+    quote: "우리는 실제보다 상상 속에서 더 자주 고통받는다.",
+    image: "https://ui-avatars.com/api/?name=Seneca&background=e0e5cc&color=4f5441&size=128",
+    concepts: [
+      {
+        id: "premeditatio",
+        title: "사전 상상 훈련",
+        summary: "최악의 경우를 미리 생각해 충격을 줄인다.",
+        benefit: "예상치 못한 사건에서 회복 시간을 줄일 수 있습니다.",
+        shadow: "불안을 과도하게 예행연습하면 오히려 긴장이 상시화될 수 있습니다.",
+        recovery: "세네카는 상상 뒤에 현재의 감사 목록을 붙여 정서를 균형화했습니다.",
+        alternative: "카뮈는 미래 통제보다 지금의 감각을 회복하는 방향을 제안합니다."
+      }
+    ],
+    dislikes: [
+      {
+        id: "anxious",
+        label: "걱정을 더 키우는 방식 같아요",
+        response: "세네카식 훈련은 짧고 제한된 시간 안에서만 수행해야 역효과를 줄일 수 있습니다.",
+        alt: "붓다: 호흡과 관찰 중심으로 사고 과열을 낮춘다."
+      }
+    ]
+  },
+  {
+    id: "marcus",
+    name: "마르쿠스 아우렐리우스",
+    school: "스토아",
+    angle: "내면 일기를 통해 판단을 정제한다.",
+    quote: "내 영혼은 내가 허락하지 않으면 다치지 않는다.",
+    image: "https://ui-avatars.com/api/?name=Marcus+Aurelius&background=e5e4ca&color=40412e&size=128",
+    concepts: [
+      {
+        id: "self-journal",
+        title: "내면 대화 기록",
+        summary: "즉시 반응 대신 자기 점검을 끼워 넣는다.",
+        benefit: "충동 반응을 줄이고 후회 비용을 낮춥니다.",
+        shadow: "지나치면 반응이 늦어져 관계에서 거리감이 생길 수 있습니다.",
+        recovery: "마르쿠스는 기록 후 바로 '오늘 할 일'을 행동 문장으로 마감했습니다.",
+        alternative: "듀이는 실천 실험을 먼저 돌려 피드백으로 교정하는 방식을 권합니다."
+      }
+    ],
+    dislikes: [
+      {
+        id: "slow",
+        label: "너무 신중해서 답답해요",
+        response: "기록-결정 사이 시간을 짧게 제한하면 느린 의사결정 문제를 줄일 수 있습니다.",
+        alt: "니체: 완전한 확신 전에도 창조적으로 먼저 실행한다."
+      }
+    ]
+  },
+  {
+    id: "socrates",
+    name: "소크라테스",
+    school: "고전 그리스",
+    angle: "질문을 통해 전제를 드러낸다.",
+    quote: "검토되지 않은 삶은 살 가치가 없다.",
+    image: "https://ui-avatars.com/api/?name=Socrates&background=ece3b6&color=373313&size=128",
+    concepts: [
+      {
+        id: "questioning",
+        title: "전제 해부 질문",
+        summary: "믿고 있는 생각의 근거를 점검한다.",
+        benefit: "자동 사고의 오류를 줄여 의사결정 정확도를 높입니다.",
+        shadow: "질문이 과해지면 실행 지연과 피로가 누적됩니다.",
+        recovery: "소크라테스식 대화는 질문 뒤에 잠정 결론을 세우는 단계가 필요합니다.",
+        alternative: "아리스토텔레스는 충분히 좋은 기준을 먼저 정하고 실행으로 검증합니다."
+      }
+    ],
+    dislikes: [
+      {
+        id: "too-many-questions",
+        label: "질문만 많고 결론이 늦어요",
+        response: "질문 횟수를 제한하고 결론 타임박스를 두면 실천성이 올라갑니다.",
+        alt: "아리스토텔레스: 중용 기준으로 빠르게 합리적 선택을 시도한다."
+      }
+    ]
+  },
+  {
+    id: "plato",
+    name: "플라톤",
+    school: "이데아론",
+    angle: "이상적 기준으로 현실을 교정한다.",
+    quote: "선의 이데아를 본 자는 다시 동굴에 머물 수 없다.",
+    image: "https://ui-avatars.com/api/?name=Plato&background=d2d7bf&color=3c4130&size=128",
+    concepts: [
+      {
+        id: "ideal-standard",
+        title: "이상 기준 설정",
+        summary: "좋은 삶의 기준점을 먼저 세운다.",
+        benefit: "방향성이 명확해져 흔들림 속에서도 기준을 잃지 않습니다.",
+        shadow: "현실과 기준의 간극이 커질 때 자기비난이 커질 수 있습니다.",
+        recovery: "플라톤 전통은 교육과 훈련을 통한 점진적 상승을 전제로 합니다.",
+        alternative: "카뮈는 완전한 기준보다 불완전한 현재를 견디는 기술을 강조합니다."
+      }
+    ],
+    dislikes: [
+      {
+        id: "ideal-pressure",
+        label: "이상이 너무 높아 숨막혀요",
+        response: "기준을 유지하되, 도달 속도는 개인 리듬으로 낮추는 해석이 필요합니다.",
+        alt: "카뮈: 완성보다 지속, 정답보다 생존을 우선한다."
+      }
+    ]
+  },
+  {
+    id: "aristotle",
+    name: "아리스토텔레스",
+    school: "덕 윤리",
+    angle: "극단을 피하고 중용을 훈련한다.",
+    quote: "탁월함은 한 번의 행위가 아니라 습관이다.",
+    image: "https://ui-avatars.com/api/?name=Aristotle&background=e5e4ca&color=52533f&size=128",
+    concepts: [
+      {
+        id: "virtue-habit",
+        title: "덕의 습관화",
+        summary: "좋은 선택을 반복해 성향으로 만든다.",
+        benefit: "일관성 있는 선택이 쌓여 신뢰 가능한 자아감이 형성됩니다.",
+        shadow: "지나치게 규범화되면 변화 대응이 둔해질 수 있습니다.",
+        recovery: "상황 맥락에 따라 중용값을 조절하는 유연성이 핵심입니다.",
+        alternative: "니체는 고정된 덕보다 새로운 가치 창조를 강조합니다."
+      }
+    ],
+    dislikes: [
+      {
+        id: "too-normal",
+        label: "너무 무난하고 평범해 보여요",
+        response: "중용은 평균주의가 아니라 상황별 최적점을 찾는 고난도 판단입니다.",
+        alt: "니체: 기존 기준을 넘어서는 자기 창조를 시도한다."
+      }
+    ]
+  },
+  {
+    id: "kierkegaard",
+    name: "키르케고르",
+    school: "실존주의",
+    angle: "불안을 회피하지 않고 결단으로 통과한다.",
+    quote: "불안은 자유의 어지러움이다.",
+    image: "https://ui-avatars.com/api/?name=Kierkegaard&background=ece3b6&color=53320b&size=128",
+    concepts: [
+      {
+        id: "leap",
+        title: "결단의 도약",
+        summary: "완전한 증거가 없어도 책임 있게 선택한다.",
+        benefit: "우유부단을 끊고 자기 서사를 앞으로 밀 수 있습니다.",
+        shadow: "도약을 미화하면 충분한 검토를 놓칠 수 있습니다.",
+        recovery: "키르케고르는 도약 뒤의 내적 성찰을 동일하게 중요시했습니다.",
+        alternative: "듀이는 작은 실험으로 위험을 분산하는 선택을 제안합니다."
+      }
+    ],
+    dislikes: [
+      {
+        id: "too-faith",
+        label: "근거보다 믿음을 강요하는 느낌이에요",
+        response: "실존적 도약은 맹신이 아니라 불확실성 하의 책임 결정으로 읽을 수 있습니다.",
+        alt: "듀이: 경험적 검증을 거치는 점진적 결정."
+      }
+    ]
+  },
+  {
+    id: "sartre",
+    name: "장 폴 사르트르",
+    school: "실존주의",
+    angle: "자유와 책임을 동시에 떠안는다.",
+    quote: "인간은 자유를 선고받았다.",
+    image: "./assets/philosophers/sartre.svg",
+    concepts: [
+      {
+        id: "freedom-responsibility",
+        title: "자유-책임 정렬",
+        summary: "선택하지 않음도 선택임을 인정한다.",
+        benefit: "회피를 줄이고 주도감을 회복할 수 있습니다.",
+        shadow: "책임 과잉 해석은 자책을 키울 수 있습니다.",
+        recovery: "사르트르는 타인과 상황의 사실성을 함께 보며 선택을 갱신했습니다.",
+        alternative: "아렌트는 개인 책임과 구조적 책임을 분리해 부담을 재배치합니다."
+      }
+    ],
+    dislikes: [
+      {
+        id: "guilt-heavy",
+        label: "책임 압박이 너무 커요",
+        response: "책임의 범위를 '내가 바꿀 수 있는 다음 행동'으로 축소하면 부담이 줄어듭니다.",
+        alt: "아렌트: 개인의 한계와 구조를 함께 읽는다."
+      }
+    ]
+  },
+  {
+    id: "nietzsche",
+    name: "프리드리히 니체",
+    school: "가치 창조",
+    angle: "주어진 기준보다 자기 기준을 만든다.",
+    quote: "너 자신이 누구인지 되어라.",
+    image: "./assets/philosophers/nietzsche.svg",
+    concepts: [
+      {
+        id: "value-creation",
+        title: "가치 재정의",
+        summary: "남의 잣대 대신 내 기준을 설계한다.",
+        benefit: "외부 평가에 흔들리는 정도가 줄고 주도성이 올라갑니다.",
+        shadow: "자기기준이 타인 배려 결핍으로 왜곡될 수 있습니다.",
+        recovery: "니체는 힘을 타자 파괴가 아닌 자기 형성의 에너지로 보았습니다.",
+        alternative: "공자적 관점은 관계적 책임을 보완해 균형을 만듭니다."
+      }
+    ],
+    dislikes: [
+      {
+        id: "too-harsh",
+        label: "강자 논리처럼 느껴져요",
+        response: "니체의 핵심은 약자 배제가 아니라 자기기만을 넘는 자기 형성입니다.",
+        alt: "공자: 관계 윤리와 상호 배려를 우선한다."
+      }
+    ]
+  },
+  {
+    id: "camus",
+    name: "알베르 카뮈",
+    school: "부조리",
+    angle: "의미 부재 속에서도 삶을 지속한다.",
+    quote: "설명되지 않아도 삶은 계속된다.",
+    image: "./assets/philosophers/camus.svg",
+    concepts: [
+      {
+        id: "absurd-endurance",
+        title: "부조리 수용",
+        summary: "완벽한 해답 없이도 오늘을 살아낸다.",
+        benefit: "결론 강박을 줄여 현재 기능을 회복하는 데 유리합니다.",
+        shadow: "수용이 체념으로 오해되면 추진력이 떨어질 수 있습니다.",
+        recovery: "카뮈는 체념이 아니라 반항적 지속을 강조했습니다.",
+        alternative: "니체는 지속을 넘어 적극적 자기 창조를 요구합니다."
+      }
+    ],
+    dislikes: [
+      {
+        id: "too-passive",
+        label: "버티기만 하고 바꾸진 않는 느낌이에요",
+        response: "카뮈의 버팀은 체념이 아니라 조건 속 행동을 계속하는 반항적 태도입니다.",
+        alt: "니체: 스스로 규칙을 다시 쓰며 행동 강도를 높인다."
+      }
+    ]
+  },
+  {
+    id: "confucius",
+    name: "공자",
+    school: "유가",
+    angle: "관계 속 역할과 예를 통해 질서를 세운다.",
+    quote: "배우고 때때로 익히면 기쁘지 아니한가.",
+    image: "https://ui-avatars.com/api/?name=Confucius&background=e5e4ca&color=40412e&size=128",
+    concepts: [
+      {
+        id: "relational-ethics",
+        title: "관계 윤리 정렬",
+        summary: "나의 자유를 관계 책임과 함께 본다.",
+        benefit: "관계 갈등에서 기준을 세우고 신뢰를 회복하기 쉽습니다.",
+        shadow: "역할 윤리가 과하면 개별 욕구가 눌릴 수 있습니다.",
+        recovery: "유가는 인(仁)을 중심에 두어 타인과 자기 모두를 살피게 합니다.",
+        alternative: "니체는 역할보다 자기창조를 우선해 개인 욕구를 회복시킵니다."
+      }
+    ],
+    dislikes: [
+      {
+        id: "hierarchy",
+        label: "위계적이고 답답해요",
+        response: "현대 해석에서는 위계를 고정권력이 아닌 상호 책임의 구조로 재해석합니다.",
+        alt: "시몬 드 보부아르: 권력 비대칭을 비판적으로 교정한다."
+      }
+    ]
+  },
+  {
+    id: "laozi",
+    name: "노자",
+    school: "도가",
+    angle: "억지 개입을 줄이고 흐름에 맞춘다.",
+    quote: "억지로 하려 하면 오히려 잃는다.",
+    image: "https://ui-avatars.com/api/?name=Laozi&background=ece3b6&color=704b23&size=128",
+    concepts: [
+      {
+        id: "wu-wei",
+        title: "무위의 조절",
+        summary: "과개입을 줄여 자연스러운 회복을 기다린다.",
+        benefit: "통제 강박을 낮추고 에너지 누수를 줄입니다.",
+        shadow: "실행 회피로 흐르면 문제가 고착될 수 있습니다.",
+        recovery: "노자식 무위는 방치가 아니라 최소한의 정확한 개입을 뜻합니다.",
+        alternative: "아렌트는 공적 행동이 필요한 순간엔 명확히 나서야 한다고 말합니다."
+      }
+    ],
+    dislikes: [
+      {
+        id: "too-passive-2",
+        label: "너무 소극적으로 느껴져요",
+        response: "무위는 무행동이 아니라 과잉행동의 절제를 뜻합니다.",
+        alt: "아렌트: 말하고 행동하는 공적 실천을 강조."
+      }
+    ]
+  },
+  {
+    id: "buddha",
+    name: "붓다",
+    school: "불교",
+    angle: "집착을 알아차리고 고통 반응을 완화한다.",
+    quote: "고통은 있다. 그러나 끝낼 길도 있다.",
+    image: "https://ui-avatars.com/api/?name=Buddha&background=f1e9c1&color=53320b&size=128",
+    concepts: [
+      {
+        id: "non-attachment",
+        title: "집착 완화 훈련",
+        summary: "사건이 아닌 집착 패턴을 본다.",
+        benefit: "감정 소용돌이에서 빠져나올 여지를 확보합니다.",
+        shadow: "잘못 쓰면 관계적 열의를 잃는 무관심으로 오해됩니다.",
+        recovery: "불교 전통은 자비를 함께 두어 거리두기와 연결을 균형화합니다.",
+        alternative: "보부아르는 관계 속 윤리적 책임을 더 강하게 요청합니다."
+      }
+    ],
+    dislikes: [
+      {
+        id: "detached",
+        label: "너무 초연해서 인간미가 없어요",
+        response: "본래 가르침은 냉담이 아니라 자비를 동반한 알아차림입니다.",
+        alt: "보부아르: 타자와의 구체적 관계 책임을 더 강조."
+      }
+    ]
+  },
+  {
+    id: "simone",
+    name: "시몬 드 보부아르",
+    school: "실존·페미니즘",
+    angle: "자유를 구조 비판과 함께 본다.",
+    quote: "여성은 태어나는 것이 아니라 만들어진다.",
+    image: "https://ui-avatars.com/api/?name=Simone+de+Beauvoir&background=e0e5cc&color=3c4130&size=128",
+    concepts: [
+      {
+        id: "situated-freedom",
+        title: "상황화된 자유",
+        summary: "개인 선택을 구조 조건과 함께 해석한다.",
+        benefit: "자기탓 과잉을 줄이고 현실 전략을 세우기 쉽습니다.",
+        shadow: "구조 설명이 과하면 개인 실행력이 약해질 수 있습니다.",
+        recovery: "보부아르는 비판 뒤에 실천 윤리를 강조하며 주체적 선택을 요구합니다.",
+        alternative: "에픽테토스는 당장 바꿀 수 있는 개인 태도부터 시작하게 돕습니다."
+      }
+    ],
+    dislikes: [
+      {
+        id: "too-political",
+        label: "너무 사회 구조 얘기 같아요",
+        response: "핵심은 정치 논쟁이 아니라 내 선택이 놓인 조건을 정확히 읽는 데 있습니다.",
+        alt: "에픽테토스: 개인 레벨에서 바로 실행 가능한 태도 조정."
+      }
+    ]
+  },
+  {
+    id: "arendt",
+    name: "한나 아렌트",
+    school: "정치철학",
+    angle: "생각 없음이 위험을 키운다는 점을 경계한다.",
+    quote: "생각하지 않음은 악의 평범성을 만든다.",
+    image: "https://ui-avatars.com/api/?name=Hannah+Arendt&background=d6d6bc&color=40412e&size=128",
+    concepts: [
+      {
+        id: "public-judgment",
+        title: "판단과 공적 책임",
+        summary: "개인 선택이 공동체에 미치는 효과를 본다.",
+        benefit: "윤리 판단의 폭이 넓어지고 장기 리스크를 줄입니다.",
+        shadow: "책임 범위를 넓게 잡으면 피로가 커질 수 있습니다.",
+        recovery: "아렌트는 '내가 답할 수 있는 범위'를 분명히 하는 판단 훈련을 강조합니다.",
+        alternative: "노자는 과잉 책임감 대신 개입 강도를 줄이는 균형을 제시합니다."
+      }
+    ],
+    dislikes: [
+      {
+        id: "too-heavy",
+        label: "책임감이 과도하게 무거워요",
+        response: "모든 문제를 떠안는 것이 아니라, 내가 응답 가능한 범위부터 분리해야 합니다.",
+        alt: "노자: 개입 강도를 줄이고 에너지를 보존한다."
+      }
+    ]
+  },
+  {
+    id: "dewey",
+    name: "존 듀이",
+    school: "프래그머티즘",
+    angle: "정답 대신 실험과 피드백으로 개선한다.",
+    quote: "우리는 생각하며 배우고, 해보며 더 잘 배운다.",
+    image: "https://ui-avatars.com/api/?name=John+Dewey&background=e5e4ca&color=52533f&size=128",
+    concepts: [
+      {
+        id: "experiment-loop",
+        title: "실험-피드백 루프",
+        summary: "작게 시도하고 결과로 수정한다.",
+        benefit: "실패 비용을 낮추며 빠르게 학습할 수 있습니다.",
+        shadow: "지속적 실험이 방향 상실로 느껴질 수 있습니다.",
+        recovery: "듀이는 실험마다 평가 기준을 명시해 방향성을 유지했습니다.",
+        alternative: "플라톤은 실험 전 고정 기준을 먼저 세우는 쪽을 선호합니다."
+      }
+    ],
+    dislikes: [
+      {
+        id: "no-core",
+        label: "핵심 신념이 약해 보여요",
+        response: "듀이는 신념이 없어서가 아니라, 신념을 검증 가능한 형태로 다루려 했습니다.",
+        alt: "플라톤: 먼저 변하지 않는 기준을 세운다."
+      }
+    ]
+  },
+  {
+    id: "heidegger",
+    name: "하이데거",
+    school: "현상학·실존",
+    angle: "죽음을 의식하며 자기 삶의 진정성을 본다.",
+    quote: "죽음에 대한 자각은 삶의 고유성을 연다.",
+    image: "https://ui-avatars.com/api/?name=Heidegger&background=ece3b6&color=53320b&size=128",
+    concepts: [
+      {
+        id: "authenticity",
+        title: "진정성 점검",
+        summary: "남의 기대가 아닌 내 선택의 근거를 찾는다.",
+        benefit: "타인 기준에서 벗어나 자기 기준을 회복합니다.",
+        shadow: "실존 성찰이 과하면 고립감이 강해질 수 있습니다.",
+        recovery: "성찰 후 일상 실천으로 되돌아오는 균형이 필요합니다.",
+        alternative: "공자는 관계 속 실천으로 고립을 완화합니다."
+      }
+    ],
+    dislikes: [
+      {
+        id: "too-heavy2",
+        label: "너무 무겁고 어두워요",
+        response: "핵심은 우울이 아니라 삶의 우선순위를 명확히 하는 데 있습니다.",
+        alt: "공자: 관계와 실천을 통해 삶의 리듬을 회복."
+      }
+    ]
+  },
+  {
+    id: "spinoza",
+    name: "스피노자",
+    school: "합리주의",
+    angle: "감정을 인과적으로 이해해 자유를 확장한다.",
+    quote: "이해는 정념을 정돈하는 시작점이다.",
+    image: "https://ui-avatars.com/api/?name=Spinoza&background=e0e5cc&color=4f5441&size=128",
+    concepts: [
+      {
+        id: "affect-understanding",
+        title: "정서 인과 분석",
+        summary: "감정을 선악보다 메커니즘으로 본다.",
+        benefit: "감정에 압도되는 빈도를 줄이고 재현 패턴을 파악할 수 있습니다.",
+        shadow: "지나치면 감정을 지나치게 이성화해 거리감이 생길 수 있습니다.",
+        recovery: "스피노자는 이해가 곧 삶의 기쁨을 확장한다고 보았습니다.",
+        alternative: "카뮈는 해석보다 감각적 삶의 밀도를 먼저 회복하자고 말합니다."
+      }
+    ],
+    dislikes: [
+      {
+        id: "too-rational",
+        label: "너무 머리로만 이해하는 느낌이에요",
+        response: "스피노자의 이해는 감정 무시가 아니라 감정의 자유도를 높이는 도구입니다.",
+        alt: "카뮈: 설명보다 살아내는 감각을 우선 회복."
+      }
+    ]
+  }
+];
+
+const PHILOSOPHY_MBTI_OPENING_BRACKET = [
+  "epictetus", "nietzsche",
+  "confucius", "laozi",
+  "plato", "aristotle",
+  "sartre", "kierkegaard",
+  "camus", "buddha",
+  "simone", "seneca",
+  "arendt", "dewey",
+  "socrates", "spinoza"
+];
 
 const defaultEntries = [
   {
@@ -862,7 +1395,10 @@ function isAdminUnlocked() {
 }
 
 function setRoute(route) {
-  const normalized = !route || route === "entry" ? "journal" : route;
+  const pageKeys = new Set(pages.map((page) => page.dataset.page));
+  const fallback = "journal";
+  const candidate = !route || route === "entry" ? fallback : route;
+  const normalized = pageKeys.has(candidate) ? candidate : fallback;
   pages.forEach((page) => {
     page.classList.toggle("is-active", page.dataset.page === normalized);
   });
@@ -886,6 +1422,186 @@ function compareEntriesDesc(a, b) {
   const bUpdated = b.updatedAt || "";
   if (aUpdated !== bUpdated) return aUpdated < bUpdated ? 1 : -1;
   return a.id < b.id ? 1 : -1;
+}
+
+const philosophyMbtiById = Object.fromEntries(PHILOSOPHY_MBTI_POOL.map((item) => [item.id, item]));
+const PHILOSOPHY_MBTI_TOTAL_CHOICES = PHILOSOPHY_MBTI_OPENING_BRACKET.length - 1;
+
+function createPhilosophyMbtiState() {
+  const bracket = PHILOSOPHY_MBTI_OPENING_BRACKET.map((id) => philosophyMbtiById[id]).filter(Boolean);
+  return {
+    round: 1,
+    pairIndex: 0,
+    selections: 0,
+    bracket,
+    winners: [],
+    result: null
+  };
+}
+
+function currentPhilosophyPair() {
+  if (!philosophyMbtiState || philosophyMbtiState.result) return [null, null];
+  const offset = philosophyMbtiState.pairIndex * 2;
+  return [philosophyMbtiState.bracket[offset] || null, philosophyMbtiState.bracket[offset + 1] || null];
+}
+
+function renderPhilosophyOptionCard(target, philosopher) {
+  if (!target) return;
+  if (!philosopher) {
+    target.innerHTML = `<strong class="mbti-name">토너먼트 종료</strong><p class="mbti-angle">다시 테스트를 눌러 새로운 매치를 시작하세요.</p>`;
+    target.disabled = true;
+    return;
+  }
+  target.disabled = false;
+  target.innerHTML = `
+    <p class="mbti-school">${escapeHtml(philosopher.school)}</p>
+    <strong class="mbti-name">${escapeHtml(philosopher.name)}</strong>
+    <p class="mbti-angle">${escapeHtml(philosopher.angle)}</p>
+    <p class="note-copy">"${escapeHtml(philosopher.quote)}"</p>
+  `;
+}
+
+function renderPhilosophyDetail() {
+  if (!philoMbti.detailPanel || !philoMbti.detailTitle) return;
+  const winner = philosophyMbtiState?.result;
+  if (!winner) {
+    philoMbti.detailTitle.textContent = "왼쪽에서 항목을 고르면 해석이 열립니다";
+    philoMbti.detailPanel.innerHTML = `<p class="helper-copy">테스트를 완료하면 맞춤 해석이 이 영역에 표시됩니다.</p>`;
+    return;
+  }
+
+  const concept = winner.concepts.find((item) => item.id === activePhilosophyConceptId) || winner.concepts[0];
+  if (!concept) {
+    philoMbti.detailPanel.innerHTML = `<p class="helper-copy">표시할 해석 항목이 없습니다.</p>`;
+    return;
+  }
+
+  philoMbti.detailTitle.textContent = concept.title;
+  const dislikeBlocks = winner.dislikes
+    .filter((item) => selectedPhilosophyDislikes.has(item.id))
+    .map(
+      (item) => `
+        <article class="mbti-detail-block">
+          <h4>마음에 안 든 지점: ${escapeHtml(item.label)}</h4>
+          <p>${escapeHtml(item.response)}</p>
+          <p>${escapeHtml(item.alt)}</p>
+        </article>
+      `
+    )
+    .join("");
+
+  philoMbti.detailPanel.innerHTML = `
+    <article class="mbti-detail-block">
+      <h4>이 관점이 주는 도움</h4>
+      <p>${escapeHtml(concept.benefit)}</p>
+    </article>
+    <article class="mbti-detail-block">
+      <h4>부담이 될 때</h4>
+      <p>${escapeHtml(concept.shadow)}</p>
+    </article>
+    <article class="mbti-detail-block">
+      <h4>철학자식 극복 방식</h4>
+      <p>${escapeHtml(concept.recovery)}</p>
+      <p>${escapeHtml(concept.alternative)}</p>
+    </article>
+    ${dislikeBlocks || '<article class="mbti-detail-block"><h4>보정 힌트</h4><p>결과가 마음에 안 드는 지점을 체크하면, 그 부분만 따로 보정한 안내를 보여줍니다.</p></article>'}
+  `;
+}
+
+function renderPhilosophyResult() {
+  if (!philoMbti.resultName || !philoMbti.resultMeta || !philoMbti.resultQuote || !philoMbti.resultImage) return;
+  const winner = philosophyMbtiState?.result;
+  if (!winner) {
+    philoMbti.resultName.textContent = "아직 결과가 정해지지 않았어요";
+    philoMbti.resultMeta.textContent = "토너먼트를 진행하면 여기에 닮은 철학자가 나타납니다.";
+    philoMbti.resultQuote.textContent = "";
+    philoMbti.resultImage.src = "./assets/philosophers/epictetus.svg";
+    if (philoMbti.checklist) philoMbti.checklist.innerHTML = `<p class="helper-copy">결과가 정해지면 체크리스트가 열립니다.</p>`;
+    if (philoMbti.dislikeChecklist) philoMbti.dislikeChecklist.innerHTML = "";
+    renderPhilosophyDetail();
+    return;
+  }
+
+  philoMbti.resultName.textContent = winner.name;
+  philoMbti.resultMeta.textContent = `${winner.school} · ${winner.angle}`;
+  philoMbti.resultQuote.textContent = winner.quote;
+  philoMbti.resultImage.src = winner.image;
+
+  if (!activePhilosophyConceptId || !winner.concepts.some((item) => item.id === activePhilosophyConceptId)) {
+    activePhilosophyConceptId = winner.concepts[0]?.id || "";
+  }
+
+  if (philoMbti.checklist) {
+    philoMbti.checklist.innerHTML = winner.concepts
+      .map(
+        (item) => `
+          <button class="mbti-check-item${item.id === activePhilosophyConceptId ? " is-active" : ""}" type="button" data-mbti-concept="${item.id}">
+            <strong>${escapeHtml(item.title)}</strong>
+            <span>${escapeHtml(item.summary)}</span>
+          </button>
+        `
+      )
+      .join("");
+  }
+
+  if (philoMbti.dislikeChecklist) {
+    philoMbti.dislikeChecklist.innerHTML = winner.dislikes
+      .map(
+        (item) => `
+          <label class="mbti-dislike-item">
+            <input type="checkbox" data-mbti-dislike="${item.id}" ${selectedPhilosophyDislikes.has(item.id) ? "checked" : ""} />
+            <span>${escapeHtml(item.label)}</span>
+          </label>
+        `
+      )
+      .join("");
+  }
+
+  renderPhilosophyDetail();
+}
+
+function renderPhilosophyMbti() {
+  if (!philosophyMbtiState) {
+    philosophyMbtiState = createPhilosophyMbtiState();
+  }
+  if (!philoMbti.prompt || !philoMbti.progress) return;
+
+  const [a, b] = currentPhilosophyPair();
+  const completed = philosophyMbtiState.selections;
+  philoMbti.progress.textContent = `${completed} / ${PHILOSOPHY_MBTI_TOTAL_CHOICES}`;
+  philoMbti.prompt.textContent = philosophyMbtiState.result
+    ? "테스트 완료 · 아래 결과와 보정 해석을 확인해보세요"
+    : `Round ${philosophyMbtiState.round} · 더 가까운 주장 하나를 선택하세요`;
+
+  renderPhilosophyOptionCard(philoMbti.optionA, a);
+  renderPhilosophyOptionCard(philoMbti.optionB, b);
+  renderPhilosophyResult();
+}
+
+function choosePhilosophyMbti(optionIndex) {
+  if (!philosophyMbtiState || philosophyMbtiState.result) return;
+  const [a, b] = currentPhilosophyPair();
+  if (!a || !b) return;
+  const winner = optionIndex === 0 ? a : b;
+  philosophyMbtiState.winners.push(winner);
+  philosophyMbtiState.selections += 1;
+  philosophyMbtiState.pairIndex += 1;
+
+  const isRoundDone = philosophyMbtiState.pairIndex * 2 >= philosophyMbtiState.bracket.length;
+  if (isRoundDone) {
+    if (philosophyMbtiState.winners.length === 1) {
+      philosophyMbtiState.result = philosophyMbtiState.winners[0];
+      activePhilosophyConceptId = philosophyMbtiState.result.concepts[0]?.id || "";
+      selectedPhilosophyDislikes.clear();
+    } else {
+      philosophyMbtiState.bracket = philosophyMbtiState.winners.slice();
+      philosophyMbtiState.winners = [];
+      philosophyMbtiState.pairIndex = 0;
+      philosophyMbtiState.round += 1;
+    }
+  }
+
+  renderPhilosophyMbti();
 }
 
 function matchesSearch(entry, query) {
@@ -1778,6 +2494,7 @@ function rerenderAll() {
   renderJournalList();
   renderPhilosopherLibrary();
   renderCognitiveLibrary();
+  renderPhilosophyMbti();
   const entry = currentEntry();
   renderSpotlight(entry);
   if (entry) renderEntry(entry);
@@ -2002,6 +2719,45 @@ overlayTabButtons.forEach((button) => {
   });
 });
 setOverlayTab("philosophers");
+
+if (philoMbti.optionA) {
+  philoMbti.optionA.addEventListener("click", () => choosePhilosophyMbti(0));
+}
+
+if (philoMbti.optionB) {
+  philoMbti.optionB.addEventListener("click", () => choosePhilosophyMbti(1));
+}
+
+if (philoMbti.checklist) {
+  philoMbti.checklist.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-mbti-concept]");
+    if (!button) return;
+    activePhilosophyConceptId = button.dataset.mbtiConcept;
+    renderPhilosophyResult();
+  });
+}
+
+if (philoMbti.dislikeChecklist) {
+  philoMbti.dislikeChecklist.addEventListener("change", (event) => {
+    const input = event.target.closest("[data-mbti-dislike]");
+    if (!input) return;
+    if (input.checked) {
+      selectedPhilosophyDislikes.add(input.dataset.mbtiDislike);
+    } else {
+      selectedPhilosophyDislikes.delete(input.dataset.mbtiDislike);
+    }
+    renderPhilosophyDetail();
+  });
+}
+
+if (philoMbti.restartButton) {
+  philoMbti.restartButton.addEventListener("click", () => {
+    philosophyMbtiState = createPhilosophyMbtiState();
+    activePhilosophyConceptId = "";
+    selectedPhilosophyDislikes.clear();
+    renderPhilosophyMbti();
+  });
+}
 
 function moveCurrentEntry(direction) {
   const list = visibleEntries();

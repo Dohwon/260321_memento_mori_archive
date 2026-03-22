@@ -26,6 +26,7 @@
         <a data-route-link href="#journal">Journal</a>
         <a data-route-link href="#overlays">Overlay Library</a>
         <a data-route-link href="#hexagon">Hexagon Signal</a>
+        <a data-route-link href="#philosophy-mbti">Philosophy MBTI</a>
       </nav>
 
       <div class="nav-actions">
@@ -385,6 +386,77 @@
               <div id="metricsList" class="metric-list"></div>
             </article>
           </aside>
+        </div>
+      </section>
+
+      <section class="page" data-page="philosophy-mbti">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">Philosophy MBTI</p>
+            <h1>질문을 고르며 닮은 철학자 찾기</h1>
+            <p class="lead">
+              서로 대비되는 주장 중 더 가까운 쪽을 고르면 토너먼트로 철학 성향을 좁혀갑니다. 결과가 마음에 들지 않으면, 어떤 점이 불편했는지 체크하고 대응 관점을 함께 볼 수 있어요.
+            </p>
+          </div>
+        </div>
+
+        <div class="mbti-lab">
+          <section class="paper-card mbti-quiz-card">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Question Arena</p>
+                <h3 id="philoMbtiPrompt">더 가까운 주장 하나를 골라주세요</h3>
+              </div>
+              <span id="philoMbtiProgress" class="date-pill">0 / 15</span>
+            </div>
+            <div class="mbti-versus-grid">
+              <button id="philoOptionA" class="mbti-choice-card" type="button"></button>
+              <button id="philoOptionB" class="mbti-choice-card" type="button"></button>
+            </div>
+          </section>
+
+          <section class="paper-card mbti-result-card">
+            <div class="mbti-result-head">
+              <img id="philoResultImage" class="mbti-result-image" alt="선택된 철학자" />
+              <div>
+                <p class="eyebrow">Current Match</p>
+                <h3 id="philoResultName">아직 결과가 정해지지 않았어요</h3>
+                <p id="philoResultMeta" class="note-copy">토너먼트를 진행하면 여기에 닮은 철학자가 나타납니다.</p>
+              </div>
+            </div>
+            <blockquote id="philoResultQuote" class="inline-quote compact-overlay-quote"></blockquote>
+            <div class="mbti-result-actions">
+              <button id="philoRestartButton" class="ghost-button" type="button">다시 테스트</button>
+            </div>
+          </section>
+
+          <div class="mbti-bottom-grid">
+            <section class="paper-card mbti-checklist-card">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Philosophy Checklist</p>
+                  <h3>이 철학에서 받아들이고 싶은 관점</h3>
+                </div>
+              </div>
+              <div id="philoChecklist" class="mbti-checklist"></div>
+
+              <div class="mbti-dislike-head">
+                <p class="eyebrow">If You Dislike This Result</p>
+                <h4>어떤 점이 불편한가요?</h4>
+              </div>
+              <div id="philoDislikeChecklist" class="mbti-dislike-list"></div>
+            </section>
+
+            <section class="paper-card mbti-detail-card">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Interpretation</p>
+                  <h3 id="philoDetailTitle">왼쪽에서 항목을 고르면 해석이 열립니다</h3>
+                </div>
+              </div>
+              <div id="philoDetailPanel" class="mbti-detail-panel"></div>
+            </section>
+          </div>
         </div>
       </section>
     </main>
