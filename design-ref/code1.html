@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Reflection Desk | Resident Notes</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@300;400;600;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "inverse-on-surface": "#a29d8b",
+              "tertiary-container": "#d9a777",
+              "on-error": "#fff7f6",
+              "on-tertiary": "#fff7f4",
+              "primary-fixed-dim": "#d2d7bf",
+              "primary-container": "#e0e5cc",
+              "surface-variant": "#ece3b6",
+              "error-container": "#fe8b70",
+              "on-background": "#373313",
+              "inverse-primary": "#faffe5",
+              "surface-container-low": "#fbf4d9",
+              "on-secondary-fixed": "#40412e",
+              "surface-dim": "#e4dba7",
+              "on-tertiary-fixed": "#271300",
+              "outline-variant": "#bab388",
+              "secondary-fixed-dim": "#d6d6bc",
+              "surface-tint": "#5c614d",
+              "on-primary-fixed": "#3c4130",
+              "on-error-container": "#742410",
+              "tertiary-fixed-dim": "#ca9a6b",
+              "on-surface-variant": "#65603c",
+              "inverse-surface": "#100e04",
+              "surface-bright": "#fff9e8",
+              "on-secondary-container": "#52533f",
+              "tertiary-fixed": "#d9a777",
+              "on-tertiary-fixed-variant": "#53320b",
+              "surface-container-highest": "#ece3b6",
+              "on-primary-container": "#4f5441",
+              "secondary-fixed": "#e5e4ca",
+              "on-surface": "#373313",
+              "on-secondary": "#fbfadf",
+              "secondary-container": "#e5e4ca",
+              "on-secondary-fixed-variant": "#5c5d48",
+              "surface-container-lowest": "#ffffff",
+              "error": "#9e422c",
+              "tertiary-dim": "#704b23",
+              "outline": "#827b55",
+              "surface": "#fff9e8",
+              "primary": "#5c614d",
+              "primary-fixed": "#e0e5cc",
+              "secondary-dim": "#545440",
+              "secondary": "#60604c",
+              "surface-container": "#f6eecd",
+              "on-tertiary-container": "#482904",
+              "surface-container-high": "#f1e9c1",
+              "on-primary": "#f6fae1",
+              "on-primary-fixed-variant": "#595e4b",
+              "error-dim": "#5c1202",
+              "primary-dim": "#505542",
+              "tertiary": "#7e572e",
+              "background": "#fff9e8"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .hexagon-grid {
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        }
+        body {
+            cursor: default;
+            -webkit-font-smoothing: antialiased;
+        }
+        textarea:focus {
+            outline: none;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #bab38833;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top Navigation Shell -->
+<nav class="fixed top-0 w-full flex justify-between items-center px-12 py-4 bg-[#fff9e8]/80 dark:bg-stone-900/80 backdrop-blur-xl z-50">
+<div class="font-serif text-2xl font-bold text-[#373313] dark:text-[#fbf4d9] tracking-tight">
+            Resident Notes
+        </div>
+<div class="hidden md:flex items-center space-x-10">
+<a class="text-[#5c614d] dark:text-[#8C927D] font-serif text-lg tracking-tight font-bold border-b-2 border-[#5c614d] pb-1" href="#">Reflection Desk</a>
+<a class="text-[#373313]/60 dark:text-[#fbf4d9]/60 hover:text-[#5c614d] font-serif text-lg tracking-tight transition-colors duration-300" href="#">Generated Entry</a>
+<a class="text-[#373313]/60 dark:text-[#fbf4d9]/60 hover:text-[#5c614d] font-serif text-lg tracking-tight transition-colors duration-300" href="#">Philosophy Notes</a>
+<a class="text-[#373313]/60 dark:text-[#fbf4d9]/60 hover:text-[#5c614d] font-serif text-lg tracking-tight transition-colors duration-300" href="#">Hexagon Signal</a>
+</div>
+<div class="flex items-center space-x-6">
+<button class="p-2 rounded-full hover:bg-[#fbf4d9]/50 transition-colors duration-300 active:scale-95 text-[#5c614d]">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="p-1 rounded-full border-2 border-primary-container hover:bg-[#fbf4d9]/50 transition-colors duration-300 active:scale-95">
+<span class="material-symbols-outlined text-3xl">account_circle</span>
+</button>
+</div>
+</nav>
+<main class="pt-28 px-8 md:px-12 max-w-[1600px] mx-auto pb-20">
+<!-- Header Section -->
+<header class="mb-12">
+<h1 class="font-headline text-5xl font-bold text-on-surface mb-2 tracking-tight">Reflection Desk</h1>
+<p class="text-on-surface-variant font-body text-lg max-w-2xl italic">The digital sanctuary for intentional thought. Bridge clinical data with philosophical depth.</p>
+</header>
+<!-- Primary Studio Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+<!-- Input Canvas (Left) -->
+<div class="lg:col-span-8 space-y-8">
+<div class="bg-surface-container-lowest rounded-xl p-8 min-h-[500px] flex flex-col group transition-shadow duration-500 hover:shadow-[0_20px_40px_rgba(55,51,19,0.06)]">
+<div class="flex items-center justify-between mb-6 border-b border-surface-container pb-4">
+<span class="text-xs uppercase tracking-widest font-bold text-outline">Active Reflection Area</span>
+<div class="flex space-x-4">
+<button class="text-primary hover:text-primary-dim flex items-center gap-2 text-sm font-semibold transition-colors">
+<span class="material-symbols-outlined text-lg">content_paste</span> Paste Clipboard
+                            </button>
+<button class="text-outline hover:text-on-surface-variant flex items-center gap-2 text-sm font-semibold transition-colors">
+<span class="material-symbols-outlined text-lg">delete_sweep</span> Clear
+                            </button>
+</div>
+</div>
+<textarea class="flex-grow w-full bg-transparent font-headline text-2xl leading-relaxed text-on-surface placeholder:text-outline-variant/50 resize-none border-none focus:ring-0 custom-scrollbar" placeholder="Paste your thoughts, clinical dialogues, or existential queries here..."></textarea>
+<div class="mt-8 flex justify-between items-center pt-6 border-t border-surface-container">
+<div class="flex items-center gap-6">
+<div class="flex flex-col">
+<span class="text-[10px] uppercase font-bold text-outline tracking-wider">Tone Spectrum</span>
+<div class="h-1.5 w-32 bg-surface-container-high rounded-full overflow-hidden mt-1">
+<div class="h-full bg-primary w-2/3"></div>
+</div>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase font-bold text-outline tracking-wider">Clarity</span>
+<div class="h-1.5 w-32 bg-surface-container-high rounded-full overflow-hidden mt-1">
+<div class="h-full bg-tertiary w-1/2"></div>
+</div>
+</div>
+</div>
+<button class="bg-primary text-on-primary px-8 py-3 rounded-full font-bold text-sm tracking-wide shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center gap-2">
+                            Synthesize Analysis <span class="material-symbols-outlined">auto_awesome</span>
+</button>
+</div>
+</div>
+<!-- Previous Echoes (Pinterest Style) -->
+<section>
+<div class="flex items-center justify-between mb-8">
+<h2 class="font-headline text-3xl font-bold">Previous Echoes</h2>
+<button class="text-sm font-bold text-primary flex items-center gap-1">View Archive <span class="material-symbols-outlined">arrow_right_alt</span></button>
+</div>
+<div class="columns-1 md:columns-2 gap-6 space-y-6">
+<!-- Card 1 -->
+<div class="break-inside-avoid bg-surface-container-lowest p-8 rounded-xl transition-transform hover:-translate-y-1 hover:shadow-sm">
+<span class="text-[10px] font-bold text-tertiary bg-on-tertiary px-2 py-1 rounded-full mb-4 inline-block uppercase">Existentialism</span>
+<h3 class="font-headline text-xl font-bold mb-3">On the weight of choice</h3>
+<p class="text-sm text-on-surface-variant line-clamp-4 leading-relaxed">The dialogue explored the paralyzing nature of absolute freedom. The resident noted a recurring pattern of avoidance linked to Kierkegaardian dread...</p>
+<div class="mt-6 flex items-center justify-between text-[11px] font-bold text-outline uppercase tracking-widest">
+<span>Oct 14, 2023</span>
+<span>1,240 Words</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="break-inside-avoid bg-surface-container-lowest p-8 rounded-xl transition-transform hover:-translate-y-1 hover:shadow-sm">
+<span class="text-[10px] font-bold text-primary bg-on-primary px-2 py-1 rounded-full mb-4 inline-block uppercase">Clinical Logic</span>
+<h3 class="font-headline text-xl font-bold mb-3">Patient 1104: Transference</h3>
+<p class="text-sm text-on-surface-variant line-clamp-3 leading-relaxed">Observation of maternal projections during session 4. Structural analysis suggests a regression to early relational archetypes.</p>
+<div class="mt-6 flex items-center justify-between text-[11px] font-bold text-outline uppercase tracking-widest">
+<span>Oct 12, 2023</span>
+<span>850 Words</span>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="break-inside-avoid bg-surface-container-lowest p-8 rounded-xl transition-transform hover:-translate-y-1 hover:shadow-sm">
+<span class="text-[10px] font-bold text-secondary bg-on-secondary px-2 py-1 rounded-full mb-4 inline-block uppercase">Reflection</span>
+<h3 class="font-headline text-xl font-bold mb-3">The Stoic Response</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed mb-4">"The impediment to action advances action. What stands in the way becomes the way." Analyzing the application of Marcus Aurelius in acute anxiety management.</p>
+<div class="aspect-video w-full rounded-lg bg-surface-container-high overflow-hidden mb-4">
+<img class="w-full h-full object-cover grayscale opacity-50 contrast-125" data-alt="Abstract marble texture with soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8qrmunI8F-ENMc5Oc0N9Yc5fzs3E8JIKwdMoPkUynFrqxXD92Rv-if2Cqci-BWObvFc2ElgG8IU5MS30atOrd3a8qZMNf1HQ_eBQZT3SQEBd-sORiEa4x1BPvxFHq8-K0qnOzpsgc6xCNBXeD9mCdTFnMhGPMHLF0hdn4QDrrTn-7gKQUABZoVOo6CWBt6omazo6vjXRYO4vXkr1XbMy-EcDn3KBOXCkiyoUn3J040Doehx4gKElilDSg2WNNGO2qqUhU5iHZra3u"/>
+</div>
+<div class="mt-6 flex items-center justify-between text-[11px] font-bold text-outline uppercase tracking-widest">
+<span>Oct 09, 2023</span>
+<span>2,100 Words</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Analysis Panel (Right) -->
+<aside class="lg:col-span-4 space-y-10">
+<!-- Live Hexagon Signal -->
+<div class="bg-surface-container-low p-8 rounded-xl relative overflow-hidden group">
+<h3 class="font-headline text-xl font-bold mb-8 relative z-10">Hexagon Signal</h3>
+<div class="relative w-full aspect-square flex items-center justify-center mb-6">
+<!-- Hexagon Background Grid -->
+<div class="absolute inset-0 flex items-center justify-center opacity-20">
+<div class="w-64 h-64 hexagon-grid border-2 border-outline"></div>
+<div class="absolute w-48 h-48 hexagon-grid border border-outline"></div>
+<div class="absolute w-32 h-32 hexagon-grid border border-outline"></div>
+<div class="absolute w-16 h-16 hexagon-grid border border-outline"></div>
+</div>
+<!-- Active Data Shape -->
+<div class="w-44 h-44 hexagon-grid bg-primary/20 border-2 border-primary relative z-10 shadow-[0_0_30px_rgba(92,97,77,0.2)]">
+<div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 w-2 h-2 rounded-full bg-primary"></div>
+<div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-2 w-2 h-2 rounded-full bg-primary"></div>
+<div class="absolute top-1/4 left-0 -translate-x-2 w-2 h-2 rounded-full bg-primary"></div>
+</div>
+<!-- Labels -->
+<span class="absolute top-2 left-1/2 -translate-x-1/2 text-[10px] font-bold text-outline uppercase tracking-widest">Reason</span>
+<span class="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] font-bold text-outline uppercase tracking-widest">Emotion</span>
+<span class="absolute left-0 top-1/2 -translate-y-1/2 -rotate-90 text-[10px] font-bold text-outline uppercase tracking-widest">Ethics</span>
+<span class="absolute right-0 top-1/2 -translate-y-1/2 rotate-90 text-[10px] font-bold text-outline uppercase tracking-widest">Logic</span>
+</div>
+<div class="space-y-4 relative z-10">
+<div class="flex justify-between items-center text-sm">
+<span class="text-on-surface-variant">Primary Resonance</span>
+<span class="font-bold text-primary">Dialectical Tension</span>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span class="text-on-surface-variant">Signal Stability</span>
+<span class="font-bold text-tertiary">92%</span>
+</div>
+</div>
+</div>
+<!-- Philosophy Overlay Cards -->
+<div class="space-y-6">
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined text-tertiary">psychology</span>
+<h3 class="font-headline text-xl font-bold">Concept Pulse</h3>
+</div>
+<div class="bg-surface-container-high p-6 rounded-xl border-l-4 border-tertiary transition-all hover:translate-x-2">
+<div class="flex items-center justify-between mb-3">
+<span class="text-[10px] font-extrabold text-tertiary uppercase tracking-tighter">Existential Concept</span>
+<span class="material-symbols-outlined text-sm text-tertiary/50">auto_stories</span>
+</div>
+<h4 class="font-headline text-lg font-bold mb-2 italic">Facticity vs. Transcendence</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">Your text suggests a struggle with 'Facticity'—the concrete realities of the patient's past—conflicting with their 'Transcendence' or future possibilities.</p>
+</div>
+<div class="bg-surface-container-high p-6 rounded-xl border-l-4 border-primary transition-all hover:translate-x-2">
+<div class="flex items-center justify-between mb-3">
+<span class="text-[10px] font-extrabold text-primary uppercase tracking-tighter">Psychological Archetype</span>
+<span class="material-symbols-outlined text-sm text-primary/50">account_tree</span>
+</div>
+<h4 class="font-headline text-lg font-bold mb-2 italic">The Caregiver’s Shadow</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">Clinical markers indicate high empathy fatigue. Reflect on the 'shadow' side of the nurturing impulse mentioned in the third paragraph.</p>
+</div>
+<!-- CTA Tooltip/Overlay (Contextual) -->
+<div class="bg-surface-dim p-6 rounded-xl relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 bg-surface-container-highest/20 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+<p class="font-headline text-sm italic mb-4 text-on-surface relative z-10">"The unexamined life is not worth living."</p>
+<button class="w-full py-2 bg-on-surface text-surface rounded-full text-xs font-bold uppercase tracking-widest hover:bg-on-surface/90 transition-colors">Start Deep Synthesis</button>
+</div>
+</div>
+</aside>
+</div>
+</main>
+<!-- Contextual FAB (Only on Reflection Desk) -->
+<button class="fixed bottom-10 right-10 w-16 h-16 bg-primary text-on-primary rounded-full shadow-[0_10px_30px_rgba(92,97,77,0.3)] flex items-center justify-center group hover:scale-110 transition-transform active:scale-95 z-50">
+<span class="material-symbols-outlined text-3xl">add</span>
+<span class="absolute right-20 bg-on-surface text-surface py-2 px-4 rounded-lg text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">New Reflection</span>
+</button>
+</body></html>

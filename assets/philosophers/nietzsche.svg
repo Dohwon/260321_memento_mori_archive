@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320">
+  <rect width="320" height="320" rx="48" fill="#f2e7e3"/>
+  <circle cx="160" cy="108" r="54" fill="#c29a9e"/>
+  <path d="M98 276c8-58 46-92 62-92s54 34 62 92" fill="#7b6e85"/>
+  <path d="M116 100c4-34 28-60 58-60 22 0 41 13 52 33-6-5-13-8-22-9-4 27-13 45-29 57l-3 2 12 22h-18l-13-21-13 21h-18l12-23c-9-5-15-11-18-22Z" fill="#2f4858"/>
+  <path d="M106 154c18 18 88 18 106 0-10 20-31 32-53 32s-43-12-53-32Z" fill="#dcb6a9"/>
+  <text x="160" y="298" text-anchor="middle" font-family="Manrope, sans-serif" font-size="24" font-weight="700" fill="#2f4858">프리드리히 니체</text>
+</svg>

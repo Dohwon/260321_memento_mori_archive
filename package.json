@@ -1,0 +1,9 @@
+{
+  "name": "memento-mori-archive",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Reflective journal prototype for writing about death as self-inquiry, not as a farewell letter.",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

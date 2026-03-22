@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-background": "#373313",
+              "on-tertiary": "#fff7f4",
+              "on-error-container": "#742410",
+              "surface-container-high": "#f1e9c1",
+              "on-primary-container": "#4f5441",
+              "on-tertiary-fixed-variant": "#53320b",
+              "on-primary-fixed": "#3c4130",
+              "secondary-container": "#e5e4ca",
+              "background": "#fff9e8",
+              "surface": "#fff9e8",
+              "surface-container-low": "#fbf4d9",
+              "on-error": "#fff7f6",
+              "tertiary-fixed-dim": "#ca9a6b",
+              "surface-container": "#f6eecd",
+              "on-secondary-container": "#52533f",
+              "on-primary": "#f6fae1",
+              "inverse-surface": "#100e04",
+              "surface-dim": "#e4dba7",
+              "on-secondary": "#fbfadf",
+              "surface-variant": "#ece3b6",
+              "on-surface": "#373313",
+              "secondary-fixed-dim": "#d6d6bc",
+              "inverse-primary": "#faffe5",
+              "outline": "#827b55",
+              "secondary-fixed": "#e5e4ca",
+              "on-primary-fixed-variant": "#595e4b",
+              "on-secondary-fixed-variant": "#5c5d48",
+              "error-dim": "#5c1202",
+              "surface-bright": "#fff9e8",
+              "error": "#9e422c",
+              "secondary-dim": "#545440",
+              "tertiary": "#7e572e",
+              "tertiary-container": "#d9a777",
+              "on-tertiary-container": "#482904",
+              "surface-container-highest": "#ece3b6",
+              "error-container": "#fe8b70",
+              "primary-fixed-dim": "#d2d7bf",
+              "on-surface-variant": "#65603c",
+              "tertiary-fixed": "#d9a777",
+              "on-secondary-fixed": "#40412e",
+              "primary-container": "#e0e5cc",
+              "surface-container-lowest": "#ffffff",
+              "primary-fixed": "#e0e5cc",
+              "primary-dim": "#505542",
+              "primary": "#5c614d",
+              "secondary": "#60604c",
+              "surface-tint": "#5c614d",
+              "tertiary-dim": "#704b23",
+              "outline-variant": "#bab388",
+              "inverse-on-surface": "#a29d8b",
+              "on-tertiary-fixed": "#271300"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        .font-serif { font-family: 'Noto Serif', serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-[#fff9e8]/80 dark:bg-stone-900/80 backdrop-blur-xl docked full-width top-0 sticky z-50 no-border tonal-shift-surface-container flat no-shadows">
+<nav class="flex justify-between items-center w-full px-12 py-6 max-w-[1920px] mx-auto">
+<div class="flex items-center gap-12">
+<span class="font-serif italic text-2xl text-[#373313] dark:text-[#fbf4d9]">The Stoic Atelier</span>
+<div class="hidden md:flex gap-8 items-center h-full">
+<a class="font-sans text-sm font-medium text-[#5c614d]/70 dark:text-[#8C927D]/70 hover:text-[#373313] dark:hover:text-white transition-colors" href="#">Journal</a>
+<a class="font-sans text-sm font-medium text-[#5c614d]/70 dark:text-[#8C927D]/70 hover:text-[#373313] dark:hover:text-white transition-colors" href="#">Reflection Studio</a>
+<a class="font-sans text-sm font-medium text-[#5c614d]/70 dark:text-[#8C927D]/70 hover:text-[#373313] dark:hover:text-white transition-colors" href="#">Philosophy Map</a>
+<a class="font-sans text-sm font-medium text-[#5c614d]/70 dark:text-[#8C927D]/70 hover:text-[#373313] dark:hover:text-white transition-colors" href="#">Library</a>
+<a class="font-sans text-sm font-medium text-[#373313] dark:text-white border-b-2 border-[#5c614d] pb-1" href="#">Hexagon Signal</a>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="bg-primary text-on-primary px-6 py-2 rounded-full font-sans text-sm font-medium hover:opacity-80 active:scale-[0.99] transition-all">New Reflection</button>
+<span class="material-symbols-outlined text-primary text-3xl cursor-pointer" data-icon="account_circle">account_circle</span>
+</div>
+</nav>
+</header>
+<main class="flex-grow w-full max-w-7xl mx-auto px-6 py-12">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Header Section -->
+<div class="lg:col-span-12 mb-8">
+<h1 class="font-serif text-5xl tracking-tight text-on-surface mb-4">Hexagon Signal</h1>
+<p class="font-body text-on-surface-variant max-w-2xl leading-relaxed">자아의 균형을 시각화합니다. 이 분석은 당신의 심리적 회복탄력성과 실존적 평온을 측정하기 위한 클리니컬 가이드라인을 기반으로 합니다.</p>
+</div>
+<!-- Radar Chart Area -->
+<div class="lg:col-span-7 bg-surface-container-lowest rounded-xl p-12 flex items-center justify-center relative overflow-hidden">
+<!-- Decorative subtle texture -->
+<div class="absolute inset-0 opacity-5 pointer-events-none" data-alt="Subtle dot pattern background" style="background-image: radial-gradient(#827b55 1px, transparent 1px); background-size: 24px 24px;"></div>
+<div class="relative w-full aspect-square max-w-lg">
+<!-- Hexagonal Grid SVG -->
+<svg class="w-full h-full transform transition-transform duration-700 hover:scale-105" viewbox="0 0 400 400">
+<!-- Background Hexagons (Concentric) -->
+<polygon fill="none" points="200,40 338.5,120 338.5,280 200,360 61.5,280 61.5,120" stroke="#827b55" stroke-opacity="0.2" stroke-width="1"></polygon>
+<polygon fill="none" points="200,80 303.9,140 303.9,260 200,320 96.1,260 96.1,140" stroke="#827b55" stroke-opacity="0.2" stroke-width="1"></polygon>
+<polygon fill="none" points="200,120 269.2,160 269.2,240 200,280 130.8,240 130.8,160" stroke="#827b55" stroke-opacity="0.2" stroke-width="1"></polygon>
+<polygon fill="none" points="200,160 234.6,180 234.6,220 200,240 165.4,220 165.4,180" stroke="#827b55" stroke-opacity="0.2" stroke-width="1"></polygon>
+<!-- Axis Lines -->
+<line stroke="#827b55" stroke-opacity="0.3" stroke-width="1" x1="200" x2="200" y1="200" y2="40"></line>
+<line stroke="#827b55" stroke-opacity="0.3" stroke-width="1" x1="200" x2="338.5" y1="200" y2="120"></line>
+<line stroke="#827b55" stroke-opacity="0.3" stroke-width="1" x1="200" x2="338.5" y1="200" y2="280"></line>
+<line stroke="#827b55" stroke-opacity="0.3" stroke-width="1" x1="200" x2="200" y1="200" y2="360"></line>
+<line stroke="#827b55" stroke-opacity="0.3" stroke-width="1" x1="200" x2="61.5" y1="200" y2="280"></line>
+<line stroke="#827b55" stroke-opacity="0.3" stroke-width="1" x1="200" x2="61.5" y1="200" y2="120"></line>
+<!-- Data Polygon -->
+<!-- Points: Self-U(85%), Emot(70%), Stress(45%), Social(60%), Exec(80%), Exist(30%) -->
+<polygon fill="#5c614d" fill-opacity="0.15" points="200,64 297,144 262.3,236 200,296 89.2,216 89.2,144" stroke="#5c614d" stroke-linejoin="round" stroke-width="2.5"></polygon>
+<!-- Data Points -->
+<circle cx="200" cy="64" fill="#5c614d" r="5"></circle>
+<circle cx="297" cy="144" fill="#5c614d" r="5"></circle>
+<circle cx="262.3" cy="236" fill="#5c614d" r="5"></circle>
+<circle cx="200" cy="296" fill="#5c614d" r="5"></circle>
+<circle cx="89.2" cy="216" fill="#5c614d" r="5"></circle>
+<circle cx="89.2" cy="144" fill="#5c614d" r="5"></circle>
+</svg>
+<!-- Labels -->
+<div class="absolute -top-6 left-1/2 -translate-x-1/2 font-label text-xs uppercase tracking-widest text-primary font-bold">자기 이해 (85)</div>
+<div class="absolute top-24 -right-12 font-label text-xs uppercase tracking-widest text-primary font-bold">감정 조절 (70)</div>
+<div class="absolute bottom-24 -right-12 font-label text-xs uppercase tracking-widest text-primary font-bold">스트레스 회복 (45)</div>
+<div class="absolute -bottom-6 left-1/2 -translate-x-1/2 font-label text-xs uppercase tracking-widest text-primary font-bold">사회적 연결 (60)</div>
+<div class="absolute bottom-24 -left-12 font-label text-xs uppercase tracking-widest text-primary font-bold">집행 기능 (80)</div>
+<div class="absolute top-24 -left-12 font-label text-xs uppercase tracking-widest text-primary font-bold">실존적 불안 (30)</div>
+</div>
+</div>
+<!-- Analysis Sidebar -->
+<div class="lg:col-span-5 flex flex-col gap-6">
+<!-- Insight Card 1 -->
+<div class="bg-surface-container-low rounded-xl p-8 transition-all hover:bg-surface-container-lowest">
+<div class="flex items-center gap-4 mb-4">
+<span class="material-symbols-outlined text-primary p-2 bg-primary-container rounded-lg" data-icon="warning">warning</span>
+<h3 class="font-serif text-xl">집중 관찰: 스트레스 회복 (45)</h3>
+</div>
+<p class="font-body text-sm text-on-surface-variant mb-6 leading-relaxed">
+                        현재 외부 자극에 대한 심리적 방어 기제가 약화된 상태입니다. 지속적인 피로감이 의사결정의 질을 저하시킬 수 있습니다.
+                    </p>
+<div class="bg-surface-container p-4 rounded-lg border-l-4 border-tertiary">
+<p class="font-body text-sm font-bold text-tertiary mb-1">Actionable Guide</p>
+<p class="font-body text-sm italic">"마르쿠스 아우렐리우스의 '명상록' 중 한 구절을 필사해 보세요. 5분간의 의도적인 호흡 연습이 평정심을 되찾는 데 큰 도움이 됩니다."</p>
+</div>
+</div>
+<!-- Insight Card 2 -->
+<div class="bg-surface-container-low rounded-xl p-8 transition-all hover:bg-surface-container-lowest">
+<div class="flex items-center gap-4 mb-4">
+<span class="material-symbols-outlined text-primary p-2 bg-primary-container rounded-lg" data-icon="verified">verified</span>
+<h3 class="font-serif text-xl">강점 영역: 자기 이해 (85)</h3>
+</div>
+<p class="font-body text-sm text-on-surface-variant mb-6 leading-relaxed">
+                        자신의 내면 상태와 가치관을 명확히 인지하고 있습니다. 이는 어려운 시기에도 중심을 잃지 않는 강력한 닻이 됩니다.
+                    </p>
+<div class="bg-surface-container p-4 rounded-lg border-l-4 border-primary">
+<p class="font-body text-sm font-bold text-primary mb-1">Preservation Strategy</p>
+<p class="font-body text-sm italic">"현재의 명료함을 유지하기 위해 주간 리플렉션 일지를 계속 작성하세요. 자신의 통찰을 타인과 나누는 것도 좋은 방법입니다."</p>
+</div>
+</div>
+</div>
+<!-- Detailed Metrics Grid (Pinterest/Masonry style) -->
+<div class="lg:col-span-12 mt-8">
+<h2 class="font-serif text-3xl mb-8">영역별 심층 분석</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Metric Card: Emotional Regulation -->
+<div class="bg-surface-container-lowest rounded-xl p-8 shadow-sm">
+<h4 class="font-serif text-lg mb-2">감정 조절 (Emotional Regulation)</h4>
+<p class="font-body text-xs text-outline mb-4">상태: 안정적 (Moderate)</p>
+<p class="font-body text-sm text-on-surface-variant leading-relaxed">자극과 반응 사이의 공간을 확보하는 능력입니다. 스토아 철학의 '판타시아' 관리를 실천하기 좋은 수준입니다.</p>
+</div>
+<!-- Metric Card: Social Connection -->
+<div class="bg-surface-container-lowest rounded-xl p-8 shadow-sm">
+<h4 class="font-serif text-lg mb-2">사회적 연결 (Social Connection)</h4>
+<p class="font-body text-xs text-outline mb-4">상태: 주의 (Needs Attention)</p>
+<p class="font-body text-sm text-on-surface-variant leading-relaxed">타인과의 정서적 유대와 공동체 의식을 측정합니다. 고립감은 실존적 불안을 증폭시킬 수 있으므로 유의가 필요합니다.</p>
+</div>
+<!-- Metric Card: Executive Function -->
+<div class="bg-surface-container-lowest rounded-xl p-8 shadow-sm">
+<h4 class="font-serif text-lg mb-2">집행 기능 (Executive Function)</h4>
+<p class="font-body text-xs text-outline mb-4">상태: 최상 (Optimal)</p>
+<p class="font-body text-sm text-on-surface-variant leading-relaxed">계획 수립, 집중 유지 및 목표 지향적 행동 능력입니다. 현재 복잡한 지적 과업을 수행하기에 가장 적합한 상태입니다.</p>
+</div>
+<!-- Metric Card: Existential Anxiety -->
+<div class="bg-surface-container-lowest rounded-xl p-8 shadow-sm">
+<h4 class="font-serif text-lg mb-2">실존적 불안 (Existential Anxiety)</h4>
+<p class="font-body text-xs text-outline mb-4">상태: 매우 낮음 (Excellent)</p>
+<p class="font-body text-sm text-on-surface-variant leading-relaxed">삶의 의미와 허무 사이에서의 균형을 의미합니다. 낮을수록 현재 삶의 목적에 대한 확신이 높음을 뜻합니다.</p>
+<div class="mt-4 pt-4 border-t border-outline-variant/10">
+<p class="font-body text-xs italic text-tertiary">"에픽테토스의 가르침처럼, 통제할 수 있는 것에 집중하고 있군요."</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-[#e4dba7] dark:bg-stone-950 full-width py-12 mt-auto tonal-shift flat flex flex-col items-center gap-4 w-full border-t border-[#bab388]/15">
+<div class="flex gap-8 mb-4">
+<a class="font-sans text-xs uppercase tracking-widest text-[#5c614d]/60 hover:text-[#373313] underline-offset-4 hover:underline transition-all" href="#">Ethics</a>
+<a class="font-sans text-xs uppercase tracking-widest text-[#5c614d]/60 hover:text-[#373313] underline-offset-4 hover:underline transition-all" href="#">Privacy</a>
+<a class="font-sans text-xs uppercase tracking-widest text-[#5c614d]/60 hover:text-[#373313] underline-offset-4 hover:underline transition-all" href="#">Archive</a>
+</div>
+<p class="font-sans text-xs uppercase tracking-widest text-[#5c614d]">© The Stoic Atelier. Crafted for Intentionality.</p>
+</footer>
+</body></html>
