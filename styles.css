@@ -472,10 +472,11 @@ strong.brand-title {
 }
 
 .mbti-quiz-card {
-  min-height: clamp(260px, 33vh, 380px);
+  min-height: clamp(320px, 34vh, 460px);
   display: grid;
   align-content: start;
   gap: 16px;
+  background: rgba(249, 244, 227, 0.82);
 }
 
 .mbti-versus-grid {
@@ -484,61 +485,120 @@ strong.brand-title {
   gap: 14px;
 }
 
+.mbti-progress-track {
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(130, 123, 85, 0.22);
+  overflow: hidden;
+}
+
+.mbti-progress-bar {
+  display: block;
+  height: 100%;
+  width: 0%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(92, 97, 77, 0.92), rgba(80, 85, 66, 0.86));
+  transition: width 240ms ease;
+}
+
 .mbti-choice-card {
   display: grid;
-  gap: 8px;
+  gap: 10px;
   text-align: left;
-  padding: 18px;
-  border-radius: 20px;
-  border: 1px solid rgba(130, 123, 85, 0.2);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 244, 229, 0.92));
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(130, 123, 85, 0.22);
+  background: rgba(255, 255, 255, 0.96);
   transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+  min-height: 310px;
 }
 
 .mbti-choice-card:hover {
   transform: translateY(-2px);
   border-color: rgba(92, 97, 77, 0.32);
-  box-shadow: 0 16px 32px rgba(92, 97, 77, 0.12);
+  box-shadow: 0 14px 28px rgba(55, 51, 19, 0.08);
+}
+
+.mbti-option-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: rgba(130, 123, 85, 0.82);
+  font-weight: 800;
+}
+
+.mbti-choice-image-wrap {
+  border-radius: 12px;
+  overflow: hidden;
+  height: 140px;
+  background: rgba(236, 227, 182, 0.52);
+}
+
+.mbti-choice-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(100%);
+  opacity: 0.86;
+}
+
+.mbti-choice-card:hover .mbti-choice-image {
+  filter: grayscale(12%);
+  opacity: 1;
 }
 
 .mbti-choice-card .mbti-name {
   font-family: var(--headline);
-  font-size: 1.12rem;
-  line-height: 1.35;
+  font-size: 1.45rem;
+  line-height: 1.28;
 }
 
 .mbti-choice-card .mbti-school {
-  font-size: 0.76rem;
-  letter-spacing: 0.08em;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--muted);
   font-weight: 800;
 }
 
 .mbti-choice-card .mbti-angle {
-  color: rgba(47, 72, 88, 0.92);
-  line-height: 1.62;
+  color: rgba(47, 72, 88, 0.86);
+  line-height: 1.55;
+  font-size: 0.9rem;
+}
+
+.mbti-choice-quote {
+  margin: 0;
+  font-family: var(--headline);
+  font-size: 1rem;
+  color: rgba(47, 72, 88, 0.78);
+  line-height: 1.5;
 }
 
 .mbti-result-card {
-  min-height: clamp(130px, 16vh, 200px);
+  min-height: clamp(160px, 18vh, 260px);
   display: grid;
-  gap: 10px;
+  gap: 12px;
+  background: rgba(241, 233, 193, 0.56);
+  border: 1px solid rgba(130, 123, 85, 0.14);
+  border-radius: 24px;
+  padding: 26px;
 }
 
 .mbti-result-head {
   display: grid;
-  grid-template-columns: 72px minmax(0, 1fr);
-  gap: 14px;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 18px;
   align-items: center;
 }
 
 .mbti-result-image {
-  width: 72px;
-  height: 72px;
-  border-radius: 18px;
+  width: 120px;
+  height: 120px;
+  border-radius: 20px;
   object-fit: cover;
-  border: 1px solid rgba(130, 123, 85, 0.24);
+  border: 1px solid rgba(130, 123, 85, 0.18);
+  filter: grayscale(100%);
 }
 
 .mbti-result-actions {
@@ -550,7 +610,7 @@ strong.brand-title {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
-  min-height: clamp(360px, 46vh, 680px);
+  min-height: clamp(380px, 48vh, 760px);
 }
 
 .mbti-checklist-card,
@@ -558,6 +618,10 @@ strong.brand-title {
   display: grid;
   gap: 12px;
   min-height: 0;
+}
+
+.mbti-detail-card {
+  background: rgba(241, 233, 193, 0.58);
 }
 
 .mbti-checklist {
@@ -581,7 +645,7 @@ strong.brand-title {
 
 .mbti-check-item.is-active {
   border-color: rgba(92, 97, 77, 0.34);
-  background: rgba(224, 229, 204, 0.58);
+  background: rgba(224, 229, 204, 0.66);
 }
 
 .mbti-check-item strong {

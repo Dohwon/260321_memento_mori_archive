@@ -25,6 +25,7 @@ const overlayQuoteAuthor = document.getElementById("overlayQuoteAuthor");
 const philoMbti = {
   prompt: document.getElementById("philoMbtiPrompt"),
   progress: document.getElementById("philoMbtiProgress"),
+  progressBar: document.getElementById("philoMbtiProgressBar"),
   optionA: document.getElementById("philoOptionA"),
   optionB: document.getElementById("philoOptionB"),
   resultImage: document.getElementById("philoResultImage"),
@@ -1445,7 +1446,7 @@ function currentPhilosophyPair() {
   return [philosophyMbtiState.bracket[offset] || null, philosophyMbtiState.bracket[offset + 1] || null];
 }
 
-function renderPhilosophyOptionCard(target, philosopher) {
+function renderPhilosophyOptionCard(target, philosopher, label) {
   if (!target) return;
   if (!philosopher) {
     target.innerHTML = `<strong class="mbti-name">토너먼트 종료</strong><p class="mbti-angle">다시 테스트를 눌러 새로운 매치를 시작하세요.</p>`;
@@ -1454,10 +1455,14 @@ function renderPhilosophyOptionCard(target, philosopher) {
   }
   target.disabled = false;
   target.innerHTML = `
+    <span class="mbti-option-label">${escapeHtml(label || "Option")}</span>
+    <div class="mbti-choice-image-wrap">
+      <img class="mbti-choice-image" src="${escapeHtml(philosopher.image)}" alt="${escapeHtml(philosopher.name)}" loading="lazy" />
+    </div>
     <p class="mbti-school">${escapeHtml(philosopher.school)}</p>
     <strong class="mbti-name">${escapeHtml(philosopher.name)}</strong>
     <p class="mbti-angle">${escapeHtml(philosopher.angle)}</p>
-    <p class="note-copy">"${escapeHtml(philosopher.quote)}"</p>
+    <p class="mbti-choice-quote">"${escapeHtml(philosopher.quote)}"</p>
   `;
 }
 
@@ -1569,12 +1574,15 @@ function renderPhilosophyMbti() {
   const [a, b] = currentPhilosophyPair();
   const completed = philosophyMbtiState.selections;
   philoMbti.progress.textContent = `${completed} / ${PHILOSOPHY_MBTI_TOTAL_CHOICES}`;
+  if (philoMbti.progressBar) {
+    philoMbti.progressBar.style.width = `${(completed / PHILOSOPHY_MBTI_TOTAL_CHOICES) * 100}%`;
+  }
   philoMbti.prompt.textContent = philosophyMbtiState.result
     ? "테스트 완료 · 아래 결과와 보정 해석을 확인해보세요"
-    : `Round ${philosophyMbtiState.round} · 더 가까운 주장 하나를 선택하세요`;
+    : `Round ${philosophyMbtiState.round} · 더 가까운 주장 하나를 선택하세요 (${completed + 1} / ${PHILOSOPHY_MBTI_TOTAL_CHOICES})`;
 
-  renderPhilosophyOptionCard(philoMbti.optionA, a);
-  renderPhilosophyOptionCard(philoMbti.optionB, b);
+  renderPhilosophyOptionCard(philoMbti.optionA, a, "Option Alpha");
+  renderPhilosophyOptionCard(philoMbti.optionB, b, "Option Beta");
   renderPhilosophyResult();
 }
 
