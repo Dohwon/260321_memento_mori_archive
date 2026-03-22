@@ -266,16 +266,17 @@
             </div>
 
             <article class="paper-card overlay-map-shell">
+              <div class="map-grid-backdrop" aria-hidden="true"></div>
               <div class="map-core-floating">
                 <p class="map-core-kicker">Core Anchor</p>
                 <strong id="mapCenterTitle">지속과 자기이해</strong>
                 <span id="mapCenterText">자주 되돌아오는 중심 주제</span>
               </div>
               <div class="philosophy-map atelier-map">
-                <div class="satellite-orb sat-virtue">Virtue</div>
-                <div class="satellite-orb sat-control">Dichotomy of Control</div>
-                <div class="satellite-orb sat-apatheia">Apatheia</div>
-                <div class="satellite-orb sat-logos">Logos</div>
+                <div class="satellite-orb sat-virtue"><small>Principle</small><strong>Virtue</strong></div>
+                <div class="satellite-orb sat-control"><small>Action</small><strong>Dichotomy of Control</strong></div>
+                <div class="satellite-orb sat-apatheia"><small>State</small><strong>Apatheia</strong></div>
+                <div class="satellite-orb sat-logos"><small>Reason</small><strong>Logos</strong></div>
                 <div class="axis-label axis-x-left">내면으로 더 깊게</div>
                 <div class="axis-label axis-x-right">바깥을 더 해석함</div>
                 <div class="axis-label axis-y-top">버티기보다 확장</div>
@@ -292,12 +293,12 @@
 
           <aside class="overlay-right-rail">
             <section class="paper-card overlay-tabs-shell">
-              <div class="overlay-tabs-bookmarks">
-                <button type="button" class="overlay-bookmark is-active" data-overlay-tab="philosophers">Philosophers</button>
-                <button type="button" class="overlay-bookmark" data-overlay-tab="cognitive">Cognitive State</button>
+              <div class="overlay-tabs-bookmarks" role="tablist" aria-label="Overlay tabs">
+                <button type="button" role="tab" aria-selected="true" aria-controls="overlayTabPanelPhilosophers" class="overlay-bookmark is-active" data-overlay-tab="philosophers">Philosophers</button>
+                <button type="button" role="tab" aria-selected="false" aria-controls="overlayTabPanelCognitive" class="overlay-bookmark" data-overlay-tab="cognitive">Cognitive State</button>
               </div>
               <div class="overlay-tabs-stack">
-                <article id="overlayTabPanelPhilosophers" class="overlay-tab-panel is-active">
+                <article id="overlayTabPanelPhilosophers" role="tabpanel" aria-hidden="false" class="overlay-tab-panel is-active">
                   <div class="panel-heading">
                     <div>
                       <p class="eyebrow">Philosophers</p>
@@ -309,9 +310,9 @@
                   <div id="overlayKeyNodes" class="tag-row"></div>
                   <blockquote id="overlayQuote" class="inline-quote compact-overlay-quote"></blockquote>
                   <p id="overlayQuoteAuthor" class="note-copy"></p>
-                  <div id="philosopherLibrary" class="philosopher-library overlay-philosopher-list horizontal-philosopher-list"></div>
+                  <div id="philosopherLibrary" class="philosopher-library overlay-philosopher-list"></div>
                 </article>
-                <article id="overlayTabPanelCognitive" class="overlay-tab-panel">
+                <article id="overlayTabPanelCognitive" role="tabpanel" aria-hidden="true" class="overlay-tab-panel">
                   <div class="panel-heading">
                     <div>
                       <p class="eyebrow">Cognitive State</p>

@@ -248,27 +248,41 @@ strong.brand-title {
 }
 
 .overlay-map-shell {
-  min-height: 380px;
-  padding: 10px 24px 16px;
-  overflow: visible;
+  position: relative;
+  min-height: 620px;
+  padding: 20px 24px 16px;
+  overflow: hidden;
   display: grid;
-  gap: 10px;
+  gap: 16px;
 }
 
 .overlay-right-rail {
-  display: block;
+  display: grid;
   min-height: calc(100vh - 190px);
+}
+
+.map-grid-backdrop {
+  position: absolute;
+  inset: 18px;
+  border-radius: 24px;
+  pointer-events: none;
+  opacity: 0.2;
+  background-image:
+    radial-gradient(circle, rgba(130, 123, 85, 0.6) 1px, transparent 1px),
+    linear-gradient(to right, rgba(130, 123, 85, 0.26) 0.5px, transparent 0.5px),
+    linear-gradient(to bottom, rgba(130, 123, 85, 0.26) 0.5px, transparent 0.5px);
+  background-size: 30px 30px, 160px 160px, 160px 160px;
+  background-position: center;
 }
 
 .atelier-map {
   min-height: 500px;
-  border-radius: 28px;
+  border-radius: 24px;
   background:
-    radial-gradient(circle at 50% 24%, rgba(233, 113, 50, 0.18), transparent 28%),
-    radial-gradient(circle at 50% 28%, rgba(178, 81, 134, 0.08), transparent 46%),
-    radial-gradient(circle at 2px 2px, rgba(47, 72, 88, 0.08) 1px, transparent 0),
-    linear-gradient(180deg, rgba(255, 253, 252, 0.98), rgba(242, 231, 227, 0.92));
-  background-size: auto, auto, 24px 24px, auto;
+    radial-gradient(circle at 50% 24%, rgba(92, 97, 77, 0.16), transparent 28%),
+    radial-gradient(circle at 50% 34%, rgba(233, 220, 171, 0.18), transparent 48%),
+    linear-gradient(180deg, rgba(255, 253, 247, 0.98), rgba(247, 239, 209, 0.9));
+  border: 1px solid rgba(130, 123, 85, 0.2);
 }
 
 .map-core-floating {
@@ -279,9 +293,10 @@ strong.brand-title {
   max-width: min(520px, 100%);
   padding: 12px 16px;
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(233, 113, 50, 0.18), rgba(255, 255, 255, 0.96));
-  border: 1px solid rgba(68, 83, 122, 0.16);
-  box-shadow: 0 14px 28px rgba(47, 72, 88, 0.1);
+  background: linear-gradient(180deg, rgba(92, 97, 77, 0.2), rgba(255, 255, 255, 0.97));
+  border: 1px solid rgba(130, 123, 85, 0.24);
+  box-shadow: 0 14px 28px rgba(92, 97, 77, 0.12);
+  z-index: 2;
 }
 
 .map-core-floating::after {
@@ -321,111 +336,119 @@ strong.brand-title {
 .satellite-orb {
   position: absolute;
   display: grid;
-  place-items: center;
-  border-radius: 16px;
+  gap: 2px;
+  align-content: center;
+  justify-items: start;
+  border-radius: 14px;
   background: rgba(255, 253, 252, 0.96);
   box-shadow: var(--shadow);
-  color: var(--slate-600);
+  color: var(--ink);
   font-family: var(--body);
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-align: center;
+  font-size: 0.76rem;
   z-index: 2;
-  border: 1px solid rgba(68, 83, 122, 0.12);
+  border: 1px solid rgba(130, 123, 85, 0.18);
+  padding: 10px 12px;
 }
 
-.satellite-orb::after {
-  content: "";
-  position: absolute;
-  width: 9px;
-  height: 9px;
-  transform: rotate(45deg);
-  background: rgba(255, 253, 252, 0.98);
-  border-right: 1px solid rgba(68, 83, 122, 0.12);
-  border-bottom: 1px solid rgba(68, 83, 122, 0.12);
-  bottom: -5px;
-  left: 50%;
-  margin-left: -4px;
+.satellite-orb small {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.satellite-orb strong {
+  font-size: 0.82rem;
+  line-height: 1.25;
+  font-family: var(--headline);
 }
 
 .sat-virtue {
-  top: 58px;
-  left: 98px;
-  width: 104px;
-  height: 56px;
+  top: 72px;
+  left: 88px;
+  width: 136px;
+  min-height: 66px;
 }
 
 .sat-control {
-  top: 66px;
-  right: 56px;
-  width: 142px;
-  height: 62px;
-  padding: 12px;
-  font-size: 0.76rem;
+  top: 74px;
+  right: 48px;
+  width: 210px;
+  min-height: 72px;
 }
 
 .sat-apatheia {
-  right: 176px;
-  top: 236px;
-  width: 106px;
-  height: 56px;
+  right: 190px;
+  top: 262px;
+  width: 140px;
+  min-height: 66px;
 }
 
 .sat-logos {
-  left: 86px;
-  top: 242px;
-  width: 86px;
-  height: 56px;
+  left: 82px;
+  top: 258px;
+  width: 120px;
+  min-height: 66px;
 }
 
 .overlay-tabs-shell {
   display: grid;
-  grid-template-columns: 58px minmax(0, 1fr);
-  gap: 14px;
+  grid-template-columns: 1fr;
+  gap: 12px;
   min-height: calc(100vh - 190px);
+  padding: 18px;
 }
 
 .overlay-tabs-bookmarks {
-  display: grid;
-  align-content: start;
-  gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px;
+  border-radius: 14px;
+  background: rgba(130, 123, 85, 0.1);
 }
 
 .overlay-bookmark {
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  border-radius: 14px;
-  padding: 12px 10px;
-  min-height: 148px;
-  background: rgba(68, 83, 122, 0.08);
-  color: var(--deep-700);
-  font-size: 0.74rem;
-  letter-spacing: 0.08em;
+  border: 0;
+  flex: 1;
+  border-radius: 10px;
+  padding: 10px 12px;
+  min-height: 40px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
   font-weight: 800;
+  text-transform: uppercase;
 }
 
 .overlay-bookmark.is-active {
-  background: linear-gradient(180deg, rgba(233, 113, 50, 0.85), rgba(178, 81, 134, 0.9));
+  background: linear-gradient(135deg, rgba(92, 97, 77, 0.94), rgba(80, 85, 66, 0.94));
   color: #fff;
-  box-shadow: 0 10px 20px rgba(47, 72, 88, 0.18);
+  box-shadow: 0 10px 18px rgba(92, 97, 77, 0.24);
 }
 
 .overlay-tabs-stack {
+  display: grid;
   min-height: 0;
 }
 
 .overlay-tab-panel {
   display: none;
-  min-height: 0;
-  height: calc(100vh - 220px);
-  overflow: auto;
-  padding-right: 4px;
+  height: calc(100vh - 272px);
+  min-height: 420px;
+  background: rgba(255, 255, 255, 0.54);
+  border-radius: 16px;
+  border: 1px solid rgba(130, 123, 85, 0.14);
+  padding: 14px;
 }
 
 .overlay-tab-panel.is-active {
-  display: grid;
-  align-content: start;
+  display: flex;
+  flex-direction: column;
   gap: 14px;
+  min-height: 0;
 }
 
 .overlay-analysis-head {
@@ -468,6 +491,10 @@ strong.brand-title {
 .overlay-philosopher-list {
   grid-template-columns: 1fr;
   gap: 12px;
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1;
+  padding-right: 6px;
 }
 
 .overlay-philosopher-list .philosopher-card {
@@ -484,6 +511,13 @@ strong.brand-title {
 
 .overlay-philosopher-list .philosopher-card-copy {
   font-size: 0.84rem;
+}
+
+#cognitiveStateList {
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1;
+  padding-right: 6px;
 }
 
 .atelier-compose-modal {
@@ -1565,6 +1599,10 @@ strong.brand-title {
 
 .philosopher-library {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.overlay-tab-panel .overlay-philosopher-list {
+  grid-template-columns: 1fr;
 }
 
 .philosopher-card,

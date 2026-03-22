@@ -1980,11 +1980,15 @@ if (modal.cancelButton) {
 function setOverlayTab(tabKey) {
   const target = tabKey === "cognitive" ? "cognitive" : "philosophers";
   overlayTabButtons.forEach((button) => {
-    button.classList.toggle("is-active", button.dataset.overlayTab === target);
+    const isActive = button.dataset.overlayTab === target;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-selected", isActive ? "true" : "false");
   });
   Object.entries(overlayTabPanels).forEach(([key, panel]) => {
     if (!panel) return;
-    panel.classList.toggle("is-active", key === target);
+    const isActive = key === target;
+    panel.classList.toggle("is-active", isActive);
+    panel.setAttribute("aria-hidden", isActive ? "false" : "true");
   });
 }
 
@@ -1993,6 +1997,7 @@ overlayTabButtons.forEach((button) => {
     setOverlayTab(button.dataset.overlayTab);
   });
 });
+setOverlayTab("philosophers");
 
 function moveCurrentEntry(direction) {
   const list = visibleEntries();
