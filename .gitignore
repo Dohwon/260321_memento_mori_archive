@@ -67,3 +67,11 @@ model_b_prompt.txt
 *.pem
 *:Zone.Identifier
 # <<< codex-sensitive-ignore <<<
+
+# project-private runtime content
+.codex
+.codex/
+data/*.json
+data/*.txt
+outputs/screenshots/
+design-ref/4th tap/

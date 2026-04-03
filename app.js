@@ -1,7 +1,4 @@
-const ADMIN_ID = "admin";
-const ADMIN_PASSWORD = "01083376120";
-const STORAGE_KEY = "reflective-atelier-entries-v3";
-const ADMIN_SESSION_KEY = "reflective-atelier-admin";
+const MBTI_RESULT_STORAGE_KEY = "reflective-atelier-philosophy-mbti-v1";
 
 const routeLinks = Array.from(document.querySelectorAll("[data-route-link]"));
 const pages = Array.from(document.querySelectorAll(".page"));
@@ -23,20 +20,29 @@ const overlayKeyNodes = document.getElementById("overlayKeyNodes");
 const overlayQuote = document.getElementById("overlayQuote");
 const overlayQuoteAuthor = document.getElementById("overlayQuoteAuthor");
 const philoMbti = {
+  questionSection: document.getElementById("philoQuestionSection"),
+  bottomGrid: document.getElementById("philoBottomGrid"),
   prompt: document.getElementById("philoMbtiPrompt"),
   progress: document.getElementById("philoMbtiProgress"),
   progressBar: document.getElementById("philoMbtiProgressBar"),
+  optionGrid: document.getElementById("philoOptionGrid"),
   optionA: document.getElementById("philoOptionA"),
   optionB: document.getElementById("philoOptionB"),
-  resultImage: document.getElementById("philoResultImage"),
-  resultName: document.getElementById("philoResultName"),
-  resultMeta: document.getElementById("philoResultMeta"),
-  resultQuote: document.getElementById("philoResultQuote"),
   checklist: document.getElementById("philoChecklist"),
   dislikeChecklist: document.getElementById("philoDislikeChecklist"),
   detailTitle: document.getElementById("philoDetailTitle"),
   detailPanel: document.getElementById("philoDetailPanel"),
-  restartButton: document.getElementById("philoRestartButton")
+  restartButton: document.getElementById("philoRestartButton"),
+  browsePanel: document.getElementById("philoBrowsePanel"),
+  browsePrev: document.getElementById("philoBrowsePrev"),
+  browseNext: document.getElementById("philoBrowseNext"),
+  browseImage: document.getElementById("philoBrowseImage"),
+  browseName: document.getElementById("philoBrowseName"),
+  browseSchool: document.getElementById("philoBrowseSchool"),
+  browseQuote: document.getElementById("philoBrowseQuote"),
+  browseAngle: document.getElementById("philoBrowseAngle"),
+  typeChart: document.getElementById("philoTypeChart"),
+  typeInsight: document.getElementById("philoTypeInsight")
 };
 
 const spotlight = {
@@ -75,8 +81,7 @@ const commentsUi = {
   password: document.getElementById("commentPassword"),
   body: document.getElementById("commentBody"),
   status: document.getElementById("commentStatus"),
-  list: document.getElementById("commentsList"),
-  adminDeleteKey: document.getElementById("adminDeleteKey")
+  list: document.getElementById("commentsList")
 };
 
 const readerModal = {
@@ -99,17 +104,21 @@ const readerModal = {
   commentBody: document.getElementById("readerCommentBody"),
   commentStatus: document.getElementById("readerCommentStatus"),
   commentsList: document.getElementById("readerCommentsList"),
-  adminDeleteKey: document.getElementById("readerAdminDeleteKey"),
   closeButtons: Array.from(document.querySelectorAll("[data-close-reader-modal]"))
 };
 
 const metricsList = document.getElementById("metricsList");
 const hexagonDataLarge = document.getElementById("hexagonDataLarge");
+const hexagonDataOpposite = document.getElementById("hexagonDataOpposite");
+const hexMapMine = document.getElementById("hexMapMine");
+const hexMapOpposite = document.getElementById("hexMapOpposite");
 const hexWeaknessList = document.getElementById("hexWeaknessList");
 const hexWeaknessKorean = document.getElementById("hexWeaknessKorean");
 const hexAdvice = document.getElementById("hexAdvice");
 const hexConclusionTitle = document.getElementById("hexConclusionTitle");
 const hexConclusionText = document.getElementById("hexConclusionText");
+const hexOverallScoreValue = document.getElementById("hexOverallScoreValue");
+const hexOverallScoreCopy = document.getElementById("hexOverallScoreCopy");
 const revisitList = document.getElementById("revisitList");
 
 const modal = {
@@ -117,6 +126,8 @@ const modal = {
   createForm: document.getElementById("entryCreateForm"),
   title: document.getElementById("modalTitleInput"),
   date: document.getElementById("modalDateInput"),
+  privateToggle: document.getElementById("modalPrivateToggle"),
+  privatePassword: document.getElementById("modalPrivatePasswordInput"),
   body: document.getElementById("modalBodyInput"),
   cancelButton: document.getElementById("cancelEntryButton"),
   status: document.getElementById("entryCreateStatus"),
@@ -131,10 +142,15 @@ const authModal = {
   status: document.getElementById("adminAuthStatus"),
   closeButtons: Array.from(document.querySelectorAll("[data-close-auth-modal]"))
 };
+const privateModal = {
+  shell: document.getElementById("privateEntryModal"),
+  form: document.getElementById("privateEntryUnlockForm"),
+  password: document.getElementById("privateEntryPasswordInput"),
+  status: document.getElementById("privateEntryStatus"),
+  closeButtons: Array.from(document.querySelectorAll("[data-close-private-modal]"))
+};
 
-const mapCenterTitle = document.getElementById("mapCenterTitle");
-const mapCenterText = document.getElementById("mapCenterText");
-const mapCoreWatermark = document.getElementById("mapCoreWatermark");
+const philosophyTypeChip = document.getElementById("philosophyTypeChip");
 const recentUpdateText = document.getElementById("recentUpdateText");
 const anniversaryCard = document.getElementById("anniversaryCard");
 const anniversaryTitle = document.getElementById("anniversaryTitle");
@@ -143,26 +159,40 @@ const anniversaryExcerpt = document.getElementById("anniversaryExcerpt");
 const anniversaryTags = document.getElementById("anniversaryTags");
 const journalHeatmap = document.getElementById("journalHeatmap");
 const heatmapMonths = document.getElementById("heatmapMonths");
+const heatmapRangeText = document.getElementById("heatmapRangeText");
+const visitCounterInline = document.getElementById("visit-counter-inline");
 const overlayTabButtons = Array.from(document.querySelectorAll("[data-overlay-tab]"));
 const overlayTabPanels = {
   philosophers: document.getElementById("overlayTabPanelPhilosophers"),
   cognitive: document.getElementById("overlayTabPanelCognitive")
 };
+const chatArchiveUi = {
+  summary: document.getElementById("chatArchiveSummary"),
+  methodology: document.getElementById("chatArchiveMethodology"),
+  segments: document.getElementById("chatArchiveSegments")
+};
 
 const MY_COMMENT_NICKNAME_KEY = "reflective-atelier-my-comment-nickname";
-const KEEP_ORIGINAL_DATE_IDS = new Set(["entry-2026-03-22-seoul-night", "entry-2026-03-22-medication"]);
 
 let currentFilter = "전체";
 let currentSearchQuery = "";
 let currentEntryId = "";
 let entries = [];
 let editingEntryId = "";
+let currentReaderEntryId = "";
 let currentPage = 1;
 const PAGE_SIZE = 4;
 let pendingPostAuthAction = null;
+let pendingPrivateEntryId = "";
+const unlockedPrivateEntryIds = new Set();
 let philosophyMbtiState = null;
 let activePhilosophyConceptId = "";
 const selectedPhilosophyDislikes = new Set();
+let philosophyBrowseIndex = 0;
+let commentSummaryByEntry = {};
+let chatArchivePayload = null;
+let chatArchiveAccess = { canAccess: false, configured: false };
+let adminAccess = { canAccess: false, configured: false };
 
 const philosopherCatalog = {
   camus: {
@@ -731,18 +761,114 @@ const PHILOSOPHY_MBTI_POOL = [
   }
 ];
 
-const PHILOSOPHY_MBTI_OPENING_BRACKET = [
-  "epictetus", "nietzsche",
-  "confucius", "laozi",
-  "plato", "aristotle",
-  "sartre", "kierkegaard",
-  "camus", "buddha",
-  "simone", "seneca",
-  "arendt", "dewey",
-  "socrates", "spinoza"
-];
+// Source: Rollin & Lages (2025), EPJ Data Science, Table 2 (Wikipedia multilingual influence ranking)
+const PUBLIC_INFLUENCE_RANK_BY_ID = {
+  aristotle: 1,
+  plato: 2,
+  nietzsche: 15,
+  socrates: 20,
+  sartre: 26,
+  spinoza: 36,
+  confucius: 39,
+  heidegger: 40,
+  marcus: 43,
+  seneca: 45,
+  kierkegaard: 62,
+  dewey: 70,
+  arendt: 81,
+  laozi: 98,
+  simone: 112,
+  epictetus: 185
+};
+
+const ENTRY_DATE_OVERRIDES = {};
 
 const defaultEntries = [
+  {
+    id: "entry-2026-03-23-party-instead-interruptions",
+    date: "2026-03-23",
+    title: "파티 대신, 방해",
+    excerpt: "축하라는 말은 버거웠지만, 닭발과 하이볼과 못생긴 꽃다발이 3초마다 들이치던 생각의 리듬을 잠깐 끊어냈다.",
+    markdown: `원래 있던 가족 모임은 취소됐다.
+또 내 잘못이다.
+
+나는 오늘도 여전히 나였고, 그래서 ‘파티’라는 말을 쓰고 싶지 않았다.
+축하의 형식을 갖춘다고 내가 달라지는 건 아니니까.
+뭘 위한 파티지, 나는 그대로인데.
+
+약을 빼먹으면 죽고 싶다는 생각이 거의 3초마다 들이친다.
+파도라기보다 알람에 가깝다.
+끊임없이, 성가시게, 정확하게.
+
+그런데 이상하게도 그 생각은 가끔 아주 소소한 일들에 방해를 받는다.
+
+내 안에서 너무 자주 반복되던 생각이 잠깐 리듬을 잃는다.
+죽고 싶다는 마음은 늘 거창한 절망에서만 오는 줄 알았는데, 막상 그 반대편도 그렇지 않은 것 같다.
+살고 싶다는 확신이 아니라, 그냥 지금 이 한 모금과 이 대화에 붙들리는 식으로도 사람은 잠시 멈춘다.
+
+어쩌면 내가 정말 받은 건 꽃이 아니라 방해였는지도 모른다.
+3초마다 들던 생각이, 오늘만큼은 자꾸 끊겼다.
+닭발의 매운 맛에 한 번,
+위스키 하이볼의 떫은 향에 한 번,
+친구가 건넨 조금 못생긴 꽃다발에 또 한 번.
+
+델피늄이랑 노란 장미였다.
+“당신을 행복하게 해줄게요.”
+“우정.”
+꽃말은 너무 성실해서 오히려 어색했다.
+
+포장은 솔직히 별로였다.
+만원이면 될 것 같은 꽃다발인데 이만원이었다.
+모양도 매끈하지 않았고, 손끝엔 종이의 거친 감촉이 남았다.
+그런데도 그 조잡한 다발이, 잠깐, 정말 잠깐, 3초마다 들어오던 생각을 가로막았다.
+
+축하라는 말은 부담스럽지만, 같이 밥을 먹고 술을 마시고 꽃을 건네받는 일은 견딜 수 있다.
+어쩌면 나는 축하받고 싶은 게 아니라 방해받고 싶은 건지도 모른다.
+죽고 싶다는 생각의 흐름을 누군가 아주 소박한 방식으로 끊어주는 것.
+살아야 한다고 설득하는 대신, 그냥 같이 닭발을 먹고 하이볼을 마시고, 별로 예쁘지도 않은 꽃다발 하나를 건네는 것.
+나는 그런 식의 다정함이 좋다.
+너무 크지 않아서, 그래서 오히려 진짜 같아서.
+
+완전히 사라지진 않는다.
+다만 그 생각과 생각 사이에 틈이 생긴다.
+나는 요즘 그 틈에서 숨을 쉰다.
+
+결국 나는 여전히 나였다.
+갑자기 좋아진 것도 아니고, 삶이 갑자기 아름다워진 것도 아니다.
+그런데도 분명히 있었던 것은, 3초마다 들던 생각이 몇 번이나 방해받았다는 사실이다.
+그리고 어쩌면 사람은 그렇게 살아남는지도 모른다.
+아주 작은 방해들 덕분에.
+끝까지 밀려오지 못한 절망들 덕분에.
+
+그 정도면 아직은 충분하지 않아도,
+적어도 완전히 아무것도 아닌 건 아니다.`,
+    body: [
+      "원래 있던 가족 모임은 취소됐다. 또 내 잘못이다.",
+      "나는 오늘도 여전히 나였고, 그래서 ‘파티’라는 말을 쓰고 싶지 않았다. 축하의 형식을 갖춘다고 내가 달라지는 건 아니니까.",
+      "약을 빼먹으면 죽고 싶다는 생각이 거의 3초마다 들이친다. 파도라기보다 알람에 가깝다.",
+      "그런데 이상하게도 그 생각은 가끔 아주 소소한 일들에 방해를 받는다. 닭발의 매운 맛, 위스키 하이볼의 떫은 향, 친구가 건넨 조금 못생긴 꽃다발.",
+      "델피늄이랑 노란 장미였다. 꽃말은 성실해서 오히려 어색했다.",
+      "포장은 별로였고 가격도 예상보다 비쌌지만, 그 조잡한 다발이 잠깐 3초마다 들어오던 생각을 가로막았다.",
+      "완전히 사라지진 않는다. 다만 그 생각과 생각 사이에 틈이 생긴다. 나는 요즘 그 틈에서 숨을 쉰다.",
+      "아주 작은 방해들 덕분에, 끝까지 밀려오지 못한 절망들 덕분에, 오늘은 완전히 아무것도 아닌 날은 아니었다."
+    ],
+    tags: ["우정", "회복", "생존", "일상", "방해"],
+    philosophyKey: "camus",
+    philosophyTitle: "카뮈와 작은 방해로 버티는 하루",
+    philosophyText:
+      "카뮈의 시선으로 보면 이 기록은 거대한 희망이 아니라, 부조리한 반복을 사소한 감각으로 끊어내는 생의 기술에 가깝습니다. 해결보다 중단, 결론보다 순간의 밀도에 기대어 하루를 통과하려는 태도가 또렷하게 읽힙니다.",
+    psychologyTitle: "반복적 위험 사고가 미시적 경험에 의해 완충되는 상태",
+    psychologyText:
+      "반복적으로 밀려오는 사고는 논리적 설득만으로 멈추기 어렵고, 감각·관계·리듬 같은 작은 현실 자극이 일시적 완충 지점을 만들 수 있습니다. 이 기록은 바로 그 완충의 작동 순간을 구체적으로 포착하고 있습니다.",
+    psychologyState: "반복 사고 사이에 짧은 완충 틈이 생기는 상태",
+    metrics: [63, 46, 34, 37, 58, 71],
+    riskLevel: "high",
+    updatedAt: "2026-03-23T21:10:00+09:00",
+    revisitPrompts: [
+      { label: "3일 후의 나", text: "오늘 나를 잠깐 멈추게 만든 방해들이 다시 작동하는지, 새로 생긴 방해는 무엇인지 적어보자." },
+      { label: "한 달 후의 나", text: "버티는 방식이 조금이라도 넓어졌는지, 혼자 버티지 않기 위해 어떤 연결을 추가했는지 돌아보자." }
+    ]
+  },
   {
     id: "entry-2026-03-20",
     date: "2026-03-20",
@@ -1152,7 +1278,7 @@ const defaultEntries = [
   },
   {
     id: "entry-2026-03-25",
-    date: "2026-03-25",
+    date: "2026-03-24",
     title: "입원이라는 단어를 현실적으로 생각해 본 날",
     excerpt: "살고 싶어서라기보다 스스로를 완전히 믿지 못해, 잠깐이라도 혼자 결정하지 않아도 되는 공간을 안전장치처럼 떠올렸다.",
     body: [
@@ -1171,7 +1297,7 @@ const defaultEntries = [
     psychologyState: "보호 환경이 필요한 고위험 구간",
     metrics: [58, 34, 22, 36, 31, 83],
     riskLevel: "critical",
-    updatedAt: "2026-03-25T20:30:00+09:00",
+    updatedAt: "2026-03-24T20:30:00+09:00",
     revisitPrompts: [
       { label: "입원 전후의 나", text: "혼자 결정하지 않아도 되는 공간이 실제로 어떤 안정을 주었는지, 혹은 어떤 불안을 남겼는지 적어보자." },
       { label: "3개월 후의 나", text: "그때 찾고 싶었던 안전장치가 지금은 어떤 형태로 내 곁에 남아 있는지 돌아보자." }
@@ -1179,7 +1305,7 @@ const defaultEntries = [
   },
   {
     id: "entry-2026-03-26",
-    date: "2026-03-26",
+    date: "2026-03-22",
     title: "지금의 상태",
     excerpt: "머리는 맑지 않고 생각은 느리게 움직이며, 몸의 회복보다 마음의 회복이 더 늦게 따라오고 있다는 감각이 선명했다.",
     body: [
@@ -1198,7 +1324,7 @@ const defaultEntries = [
     psychologyState: "회복이 느리게 따라오는 구간",
     metrics: [57, 41, 29, 39, 27, 72],
     riskLevel: "high",
-    updatedAt: "2026-03-26T18:45:00+09:00",
+    updatedAt: "2026-03-22T18:45:00+09:00",
     revisitPrompts: [
       { label: "일주일 후의 나", text: "생각의 속도와 몸의 감각이 지금보다 조금이라도 달라졌는지, 가장 작게 변한 부분을 적어보자." },
       { label: "다시 일을 시작하기 전의 나", text: "불안이 줄었는지보다, 지금의 내가 감당 가능한 리듬이 무엇인지 먼저 써보자." }
@@ -1345,54 +1471,558 @@ function plainTextFromMarkdown(markdown) {
     .trim();
 }
 
-function loadEntries() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return defaultEntries;
-    const parsed = JSON.parse(raw);
-    const isValid =
-      Array.isArray(parsed) &&
-      parsed.length &&
-      parsed.every(
-        (entry) =>
-          typeof entry.id === "string" &&
-          typeof entry.title === "string" &&
-          Array.isArray(entry.body) &&
-          Array.isArray(entry.tags) &&
-          typeof entry.philosophyKey === "string"
-      );
-    if (!isValid) return defaultEntries;
-    const merged = [...parsed];
-    const existingIds = new Set(parsed.map((entry) => entry.id));
-    defaultEntries.forEach((entry) => {
-      if (!existingIds.has(entry.id)) {
-        merged.push(entry);
-      }
-    });
-    return merged;
-  } catch {
-    return defaultEntries;
+function toYmdDate(value) {
+  if (typeof value !== "string") return "";
+  const raw = value.trim();
+  if (!raw) return "";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+  const isoMatch = raw.match(/^(\d{4}-\d{2}-\d{2})T/);
+  if (isoMatch) return isoMatch[1];
+
+  const dotted = raw.match(/^(\d{4})[./-](\d{1,2})[./-](\d{1,2})$/);
+  if (dotted) {
+    const [, y, m, d] = dotted;
+    return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
   }
+
+  const parsed = new Date(raw);
+  if (Number.isNaN(parsed.getTime())) return "";
+  return parsed.toISOString().slice(0, 10);
 }
 
-function normalizeEntryDatesForUserRequest(list) {
-  return list.map((entry) => {
-    if (KEEP_ORIGINAL_DATE_IDS.has(entry.id)) return entry;
-    const next = { ...entry, date: "2026-03-21" };
-    if (typeof next.updatedAt === "string" && next.updatedAt.includes("T")) {
-      const timePart = next.updatedAt.split("T")[1];
-      next.updatedAt = `2026-03-21T${timePart}`;
-    }
-    return next;
+function todayYmdSeoul() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(new Date());
+}
+
+function normalizeDateNotFuture(value) {
+  const base = toYmdDate(value);
+  if (!base) return "";
+  const today = todayYmdSeoul();
+  let [year, month, day] = base.split("-").map((part) => Number(part));
+  let normalized = base;
+  let guard = 0;
+  while (normalized > today && guard < 10) {
+    year -= 1;
+    normalized = `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    guard += 1;
+  }
+  return normalized;
+}
+
+function stripBrokenChars(value) {
+  return String(value || "")
+    .replace(/\uFFFD+/g, "")
+    .replace(/오늘의\s*록/g, "오늘의 기록")
+    .replace(/다시\s*록/g, "다시 기록")
+    .replace(/찾는\s*관/g, "찾는 습관")
+    .trim();
+}
+
+function normalizeUpdatedAt(value, fallbackDate) {
+  const fallback = `${fallbackDate}T12:00:00+09:00`;
+  if (typeof value !== "string" || !value.trim()) return fallback;
+  const time = Date.parse(value);
+  if (Number.isNaN(time)) return fallback;
+  const datePart = toYmdDate(value);
+  if (!datePart) return fallback;
+  if (normalizeDateNotFuture(datePart) !== datePart) return fallback;
+  return value;
+}
+
+function isEntryPrivate(entry) {
+  return Boolean(entry?.isPrivate);
+}
+
+function canAccessEntry(entry) {
+  if (!isEntryPrivate(entry)) return true;
+  return unlockedPrivateEntryIds.has(entry.id);
+}
+
+function normalizeStoredEntry(entry) {
+  if (!entry || typeof entry !== "object") return null;
+  const safeEntry = { ...entry };
+  delete safeEntry.privatePassword;
+  const id = typeof entry.id === "string" && entry.id.trim() ? entry.id.trim() : "";
+  const title = stripBrokenChars(entry.title);
+  if (!id || !title) return null;
+
+  const markdown =
+    typeof entry.markdown === "string"
+      ? stripBrokenChars(entry.markdown)
+      : Array.isArray(entry.body)
+      ? entry.body.map((line) => stripBrokenChars(line)).filter(Boolean).join("\n\n")
+      : "";
+  const body = Array.isArray(entry.body)
+    ? entry.body.map((line) => stripBrokenChars(line)).filter(Boolean)
+    : markdown
+    ? markdown
+        .split(/\n+/)
+        .map((line) => stripBrokenChars(line))
+        .filter(Boolean)
+    : [];
+  if (!body.length && !markdown) return null;
+
+  const textPool = markdown || body.join("\n");
+  const tags = Array.isArray(entry.tags)
+    ? entry.tags.map((tag) => stripBrokenChars(tag)).filter(Boolean).slice(0, 5)
+    : inferTagsFromBody(textPool);
+  const safeTags = tags.length ? tags : inferTagsFromBody(textPool);
+  const plain = plainTextFromMarkdown(textPool);
+  const excerpt =
+    typeof entry.excerpt === "string" && stripBrokenChars(entry.excerpt)
+      ? stripBrokenChars(entry.excerpt)
+      : (plain || body.join(" ")).slice(0, 110);
+  const idDateMatch = id.match(/entry-(\d{4}-\d{2}-\d{2})/);
+  const idDate = idDateMatch?.[1] || "";
+  const dateFromEntry = normalizeDateNotFuture(entry.date);
+  const dateFromUpdatedAt = normalizeDateNotFuture(entry.updatedAt);
+  const safeIdDate = idDate;
+  const forcedDate = ENTRY_DATE_OVERRIDES[id] || "";
+  const date =
+    normalizeDateNotFuture(forcedDate) ||
+    dateFromEntry ||
+    normalizeDateNotFuture(safeIdDate) ||
+    dateFromUpdatedAt ||
+    todayYmdSeoul();
+  const philosophyKey =
+    typeof entry.philosophyKey === "string" && philosopherCatalog[entry.philosophyKey]
+      ? entry.philosophyKey
+      : "camus";
+  const philosopher = philosopherCatalog[philosophyKey];
+  const riskLevel = ["low", "watch", "high", "critical"].includes(entry.riskLevel) ? entry.riskLevel : "watch";
+  const metrics = Array.isArray(entry.metrics) && entry.metrics.length === 6 ? entry.metrics.map((value) => Number(value) || 0) : [66, 52, 44, 40, 55, 52];
+
+  return {
+    ...safeEntry,
+    id,
+    title,
+    date,
+    markdown: markdown || body.join("\n\n"),
+    body,
+    tags: safeTags,
+    excerpt,
+    philosophyKey,
+    philosophyTitle:
+      typeof entry.philosophyTitle === "string" && entry.philosophyTitle.trim()
+        ? entry.philosophyTitle
+        : `${philosopher.name}의 언어로 다시 읽는 오늘의 기록`,
+    philosophyText:
+      typeof entry.philosophyText === "string" && entry.philosophyText.trim()
+        ? entry.philosophyText
+        : philosopher.description,
+    psychologyTitle:
+      typeof entry.psychologyTitle === "string" && entry.psychologyTitle.trim()
+        ? entry.psychologyTitle
+        : "지금의 상태를 기록으로 붙잡는 구간",
+    psychologyText:
+      typeof entry.psychologyText === "string" && entry.psychologyText.trim()
+        ? entry.psychologyText
+        : "정답을 강요하지 않고 현재 감정의 패턴을 관찰하는 기록은 회복의 시작점이 될 수 있습니다.",
+    psychologyState:
+      typeof entry.psychologyState === "string" && entry.psychologyState.trim()
+        ? entry.psychologyState
+        : "관찰과 회복이 함께 필요한 상태",
+    metrics,
+    riskLevel,
+    isPrivate: Boolean(entry.isPrivate),
+    isLocked: Boolean(entry.isLocked && entry.isPrivate),
+    updatedAt: normalizeUpdatedAt(entry.updatedAt, date),
+    revisitPrompts:
+      Array.isArray(entry.revisitPrompts) && entry.revisitPrompts.length
+        ? entry.revisitPrompts
+        : [
+            { label: "7일 후의 나", text: "이 감정의 밀도와 방향이 어떻게 달라졌는지 짧게 적어보자." },
+            { label: "1년 후의 나", text: "오늘의 기록이 어떤 변화의 출발점이었는지 돌아보자." }
+          ]
+  };
+}
+
+function normalizeEntryList(list) {
+  if (!Array.isArray(list)) return [];
+  return list.map(normalizeStoredEntry).filter(Boolean);
+}
+
+function mergeEntriesByPriority(...lists) {
+  const byId = new Map();
+  lists.forEach((list) => {
+    normalizeEntryList(list).forEach((entry) => {
+      byId.set(entry.id, entry);
+    });
   });
+  return Array.from(byId.values()).sort(compareEntriesDesc);
+}
+
+function loadEntries() {
+  return defaultEntries;
 }
 
 function saveEntries() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  return;
+}
+
+async function fetchServerEntries() {
+  try {
+    const response = await fetch("/api/entries");
+    if (!response.ok) return null;
+    const payload = await response.json();
+    if (!payload?.ok || !Array.isArray(payload.entries)) return null;
+    return normalizeEntryList(payload.entries);
+  } catch {
+    return null;
+  }
+}
+
+async function syncEntriesToServer() {
+  try {
+    const response = await fetch("/api/entries", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ entries })
+    });
+    if (!response.ok) return false;
+    const payload = await response.json();
+    return Boolean(payload?.ok);
+  } catch {
+    return false;
+  }
+}
+
+async function refreshEntriesFromServer() {
+  const serverEntries = await fetchServerEntries();
+  if (!serverEntries) return false;
+  entries = mergeEntriesByPriority(defaultEntries, serverEntries);
+  currentEntryId = entries.find((entry) => entry.id === currentEntryId)?.id || entries[0]?.id || "";
+  rerenderAll();
+  void fetchCommentCounts();
+  return true;
+}
+
+async function fetchChatArchivePayload() {
+  if (!chatArchiveAccess.canAccess) return null;
+  try {
+    const response = await fetch("/api/chat-archive");
+    if (!response.ok) return null;
+    const payload = await response.json();
+    return payload?.archive || null;
+  } catch {
+    return null;
+  }
+}
+
+async function fetchChatArchiveAccess() {
+  try {
+    const response = await fetch("/api/chat-archive/access");
+    if (!response.ok) return { canAccess: false, configured: false };
+    const payload = await response.json();
+    return {
+      canAccess: Boolean(payload?.canAccess),
+      configured: Boolean(payload?.configured)
+    };
+  } catch {
+    return { canAccess: false, configured: false };
+  }
+}
+
+async function fetchAdminAccess() {
+  try {
+    const response = await fetch("/api/admin/access");
+    if (!response.ok) return { canAccess: false, configured: false };
+    const payload = await response.json();
+    return {
+      canAccess: Boolean(payload?.canAccess),
+      configured: Boolean(payload?.configured)
+    };
+  } catch {
+    return { canAccess: false, configured: false };
+  }
+}
+
+function applyChatArchiveVisibility() {
+  const chatArchiveRouteLink = routeLinks.find((link) => link.getAttribute("href") === "#chat-archive");
+  if (!chatArchiveRouteLink) return;
+  chatArchiveRouteLink.classList.toggle("is-locked", chatArchiveAccess.configured && !chatArchiveAccess.canAccess);
+}
+
+function riskToneClass(riskLevel) {
+  return ["low", "watch", "high", "critical"].includes(riskLevel) ? riskLevel : "watch";
+}
+
+function renderArchiveDetailCard(title, items) {
+  const list = Array.isArray(items) ? items.filter(Boolean) : [];
+  if (!list.length) return "";
+  return `
+    <article class="chat-detail-card">
+      <p class="eyebrow">${escapeHtml(title)}</p>
+      <ul class="chat-detail-list">
+        ${list.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+      </ul>
+    </article>
+  `;
+}
+
+function renderChatArchive() {
+  if (!chatArchiveUi.summary || !chatArchiveUi.methodology || !chatArchiveUi.segments) return;
+  if (!chatArchivePayload) {
+    const accessCopy = chatArchiveAccess.configured
+      ? "이 페이지는 잠겨 있습니다. 비밀번호를 입력하면 이 브라우저에서만 열립니다."
+      : "서버에 비밀번호 보호 설정이 아직 연결되지 않아 Chat Archive를 열 수 없습니다.";
+    chatArchiveUi.summary.innerHTML = `
+      <p class="eyebrow">Private Archive</p>
+      <h3>잠긴 기록 페이지</h3>
+      <p class="note-copy">${escapeHtml(accessCopy)}</p>
+    `;
+    chatArchiveUi.methodology.innerHTML = `
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow">Locked View</p>
+          <h3>비공개 아카이브</h3>
+        </div>
+        <span class="date-pill">${chatArchiveAccess.configured ? "password" : "setup needed"}</span>
+      </div>
+      <p class="note-copy">페이지 자체는 남겨 두되, 실제 대화 데이터는 서버에서 직접 잠가 둡니다. 정적 JSON이나 프론트 소스만으로는 원문을 받을 수 없도록 처리되어 있습니다.</p>
+    `;
+    chatArchiveUi.segments.innerHTML = `
+      <article class="paper-card chat-segment-card chat-archive-locked-card">
+        <div class="chat-archive-dim"></div>
+        <div class="chat-archive-lock-body">
+          <p class="eyebrow">Locked Archive</p>
+          <h3>업로드 대화 감정 아카이브</h3>
+          <p class="note-copy">권한이 없는 요청에서는 세그먼트 데이터를 서버가 내려주지 않습니다. 이 브라우저에서만 열 수 있도록 비밀번호로 잠겨 있습니다.</p>
+          ${
+            chatArchiveAccess.configured
+              ? `
+                <form id="chatArchiveUnlockForm" class="chat-archive-unlock-form">
+                  <label class="field">
+                    <span>비밀번호</span>
+                    <input id="chatArchivePasswordInput" type="password" autocomplete="current-password" placeholder="비밀번호 입력" />
+                  </label>
+                  <div class="comment-actions">
+                    <button type="submit" class="ghost-button strong">열기</button>
+                    <p id="chatArchiveUnlockStatus" class="helper-copy"></p>
+                  </div>
+                </form>
+              `
+              : `<p class="helper-copy">서버 비밀번호 설정이 아직 비어 있습니다.</p>`
+          }
+        </div>
+      </article>
+    `;
+    const unlockForm = document.getElementById("chatArchiveUnlockForm");
+    if (unlockForm) {
+      unlockForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const passwordInput = document.getElementById("chatArchivePasswordInput");
+        const status = document.getElementById("chatArchiveUnlockStatus");
+        if (!passwordInput || !status) return;
+        status.textContent = "확인 중…";
+        try {
+          const response = await fetch("/api/chat-archive/unlock", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ password: passwordInput.value })
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok || !payload?.ok) {
+            status.textContent = "비밀번호가 맞지 않습니다.";
+            return;
+          }
+          chatArchiveAccess = { canAccess: true, configured: true };
+          applyChatArchiveVisibility();
+          chatArchivePayload = await fetchChatArchivePayload();
+          renderChatArchive();
+        } catch {
+          status.textContent = "잠금 해제 중 오류가 발생했습니다.";
+        }
+      });
+    }
+    return;
+  }
+
+  const stats = chatArchivePayload.summaryStats || {};
+  const speakerInference = chatArchivePayload.speakerInference || {};
+  const cycleSummary = chatArchivePayload.cycleSummary || {};
+  const segments = Array.isArray(chatArchivePayload.segments) ? chatArchivePayload.segments : [];
+  const userSignals = Array.isArray(speakerInference.userSignals) ? speakerInference.userSignals : [];
+  const assistantSignals = Array.isArray(speakerInference.assistantSignals) ? speakerInference.assistantSignals : [];
+  const cycleSteps = Array.isArray(cycleSummary.steps) ? cycleSummary.steps : [];
+
+  chatArchiveUi.summary.innerHTML = `
+    <p class="eyebrow">Archive Snapshot</p>
+    <h3>${escapeHtml(chatArchivePayload.title || "업로드 대화 감정 아카이브")}</h3>
+    <p class="note-copy">${escapeHtml(chatArchivePayload.note || "")}</p>
+    <article class="chat-archive-observer-callout">
+      <p class="eyebrow">Observer Lens</p>
+      <p>${escapeHtml(chatArchivePayload.observerLens || "")}</p>
+    </article>
+    <div class="chat-archive-stat-grid">
+      <article class="chat-archive-stat-card">
+        <strong>${Number(stats.segmentCount || segments.length || 0)}</strong>
+        <span>격화 구간</span>
+      </article>
+      <article class="chat-archive-stat-card">
+        <strong>${Number(stats.criticalSegments || 0)}</strong>
+        <span>critical</span>
+      </article>
+      <article class="chat-archive-stat-card">
+        <strong>${escapeHtml(chatArchivePayload.lastKnownConversationDate || "미상")}</strong>
+        <span>마지막 확인일</span>
+      </article>
+    </div>
+    <div class="chat-archive-meta-list">
+      <div>
+        <span>원본 파일</span>
+        <strong>${escapeHtml(chatArchivePayload.sourceFile || "미상")}</strong>
+      </div>
+      <div>
+        <span>화자 추정 신뢰도</span>
+        <strong>${escapeHtml(speakerInference.confidence || "unknown")}</strong>
+      </div>
+      <div>
+        <span>분류 방식</span>
+        <strong>${escapeHtml(chatArchivePayload.coverageMode || "manual")}</strong>
+      </div>
+    </div>
+    <div class="comment-actions">
+      <button id="chatArchiveLockButton" class="ghost-button" type="button">잠금</button>
+      <p class="helper-copy">이 브라우저에서는 잠금 해제된 상태입니다.</p>
+    </div>
+    <article class="chat-archive-loop-card">
+      <p class="eyebrow">${escapeHtml(cycleSummary.title || "반복 루프")}</p>
+      <p class="note-copy">${escapeHtml(cycleSummary.description || "")}</p>
+      <ol class="chat-cycle-list">
+        ${cycleSteps.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+      </ol>
+    </article>
+  `;
+  const lockButton = document.getElementById("chatArchiveLockButton");
+  if (lockButton) {
+    lockButton.addEventListener("click", async () => {
+      try {
+        await fetch("/api/chat-archive/lock", { method: "POST" });
+      } catch {
+        // Ignore lock errors.
+      }
+      chatArchiveAccess = { canAccess: false, configured: chatArchiveAccess.configured };
+      chatArchivePayload = null;
+      applyChatArchiveVisibility();
+      renderChatArchive();
+    });
+  }
+
+  chatArchiveUi.methodology.innerHTML = `
+    <div class="panel-heading">
+      <div>
+        <p class="eyebrow">Speaker Inference</p>
+        <h3>화자 구분 근거</h3>
+      </div>
+      <span class="date-pill">timestamps 없음</span>
+    </div>
+    <p class="note-copy">파일에 화자명과 시간이 없어, 아래 신호를 기준으로 사용자/ChatGPT 발화를 추정했다. 저강도 분석 구간은 과감히 압축하고, 감정 진폭이 급격히 커지는 창만 남겼다.</p>
+    <div class="chat-method-grid">
+      <article class="chat-method-card">
+        <p class="eyebrow">추정: 사용자</p>
+        <ul class="chat-method-list">
+          ${userSignals.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+        </ul>
+      </article>
+      <article class="chat-method-card">
+        <p class="eyebrow">추정: ChatGPT</p>
+        <ul class="chat-method-list">
+          ${assistantSignals.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+        </ul>
+      </article>
+    </div>
+  `;
+
+  chatArchiveUi.segments.innerHTML = segments
+    .map((segment) => {
+      const intensity = Math.max(1, Math.min(5, Number(segment.intensity || 1)));
+      const quotes = Array.isArray(segment.quotes) ? segment.quotes.slice(0, 3) : [];
+      const bodySignals = Array.isArray(segment.bodySignals) ? segment.bodySignals : [];
+      const detailCards = [
+        renderArchiveDetailCard("당시 머릿속 규칙", segment.cognitivePatterns),
+        renderArchiveDetailCard("버틴 방식", segment.copingAttempts),
+        renderArchiveDetailCard("다시 무너뜨린 요인", segment.reescalationTriggers),
+        renderArchiveDetailCard("실제로 필요했던 것", segment.actualNeeds)
+      ]
+        .filter(Boolean)
+        .join("");
+      return `
+        <article class="paper-card chat-segment-card risk-${riskToneClass(segment.riskLevel)}">
+          <div class="chat-segment-head">
+            <div>
+              <p class="eyebrow">Segment ${Number(segment.order || 0)}</p>
+              <h3>${escapeHtml(segment.title || "이름 없는 구간")}</h3>
+            </div>
+            <div class="chat-segment-badges">
+              <span class="date-pill">${escapeHtml(segment.lineRange || "line range 없음")}</span>
+              <span class="risk-chip">${escapeHtml(segment.riskLevel || "watch")}</span>
+            </div>
+          </div>
+          <div class="chat-segment-subhead">
+            <div class="chat-segment-phase-row">
+              <span class="meta-quiet">${escapeHtml(segment.phase || "")}</span>
+              ${segment.cycleStage ? `<span class="chat-cycle-chip">${escapeHtml(segment.cycleStage)}</span>` : ""}
+            </div>
+            <div class="chat-intensity" aria-label="감정 강도 ${intensity}/5">
+              ${Array.from({ length: 5 }, (_, index) => `<span class="chat-intensity-dot${index < intensity ? " is-active" : ""}"></span>`).join("")}
+            </div>
+          </div>
+          <p class="note-copy">${escapeHtml(segment.turningPoint || "")}</p>
+          <article class="chat-segment-observer">
+            <p class="eyebrow">관찰자 시점</p>
+            <p>${escapeHtml(segment.observerNote || "")}</p>
+            ${segment.internalRule ? `<p class="chat-internal-rule"><strong>당시 내 안의 규칙</strong>${escapeHtml(segment.internalRule)}</p>` : ""}
+            ${
+              bodySignals.length
+                ? `<div class="chat-signal-row">${bodySignals.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+                : ""
+            }
+          </article>
+          <div class="tag-row">
+            ${(Array.isArray(segment.dominantEmotions) ? segment.dominantEmotions : []).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}
+          </div>
+          <div class="chat-segment-columns">
+            <article class="chat-segment-panel">
+              <p class="eyebrow">추정: 나</p>
+              <p>${escapeHtml(segment.userStateSummary || "")}</p>
+            </article>
+            <article class="chat-segment-panel">
+              <p class="eyebrow">추정: ChatGPT</p>
+              <p>${escapeHtml(segment.assistantRoleSummary || "")}</p>
+            </article>
+          </div>
+          <div class="chat-segment-footer">
+            <div class="tag-row">
+              ${(Array.isArray(segment.dominantThemes) ? segment.dominantThemes : []).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}
+            </div>
+            ${detailCards ? `<div class="chat-detail-grid">${detailCards}</div>` : ""}
+            <div class="chat-quote-list">
+              ${quotes
+                .map(
+                  (quote) => `
+                    <blockquote class="chat-quote-card">
+                      <p>${escapeHtml(quote.text || "")}</p>
+                      <footer>${escapeHtml(quote.speaker || "추정 화자")}</footer>
+                    </blockquote>
+                  `
+                )
+                .join("")}
+            </div>
+          </div>
+        </article>
+      `;
+    })
+    .join("");
 }
 
 function isAdminUnlocked() {
-  return sessionStorage.getItem(ADMIN_SESSION_KEY) === "true";
+  return Boolean(adminAccess.canAccess);
 }
 
 function setRoute(route) {
@@ -1418,52 +2048,300 @@ function normalizedSearch(value) {
 }
 
 function compareEntriesDesc(a, b) {
-  if (a.date !== b.date) return a.date < b.date ? 1 : -1;
   const aUpdated = a.updatedAt || "";
   const bUpdated = b.updatedAt || "";
   if (aUpdated !== bUpdated) return aUpdated < bUpdated ? 1 : -1;
+  if (a.date !== b.date) return a.date < b.date ? 1 : -1;
   return a.id < b.id ? 1 : -1;
 }
 
 const philosophyMbtiById = Object.fromEntries(PHILOSOPHY_MBTI_POOL.map((item) => [item.id, item]));
-const PHILOSOPHY_MBTI_TOTAL_CHOICES = PHILOSOPHY_MBTI_OPENING_BRACKET.length - 1;
+const PHILOSOPHY_MBTI_MAX_QUESTIONS = 20;
+const PHILOSOPHY_MBTI_MIN_CONCEPTS = 4;
+const PHILOSOPHY_MBTI_MIN_DISLIKES = 4;
+const PHILOSOPHY_MBTI_QUESTIONS = [
+  { id: "q1", prompt: "문제가 생겼을 때 먼저 하는 행동은?", optionA: { title: "원인과 구조를 해석한다", subtitle: "논리로 구조를 먼저 본다", next: "q2", weights: { spinoza: 2, aristotle: 1, epictetus: 1 } }, optionB: { title: "지금 감정과 욕구를 확인한다", subtitle: "몸과 정서를 먼저 읽는다", next: "q3", weights: { camus: 1, buddha: 2, simone: 1 } } },
+  { id: "q2", prompt: "불확실한 미래가 올 때 더 가까운 태도는?", optionA: { title: "통제 가능한 것만 잡는다", subtitle: "범위를 줄인다", next: "q4", weights: { epictetus: 2, seneca: 1, marcus: 1 } }, optionB: { title: "불확실성 자체를 견디며 실험한다", subtitle: "작게 시도한다", next: "q5", weights: { dewey: 2, nietzsche: 1, sartre: 1 } } },
+  { id: "q3", prompt: "관계 갈등이 생기면 어디를 먼저 보나요?", optionA: { title: "내 책임과 선택", subtitle: "내가 바꿀 수 있는 것", next: "q5", weights: { sartre: 2, kierkegaard: 1, marcus: 1 } }, optionB: { title: "관계 구조와 맥락", subtitle: "권력·역할·환경", next: "q6", weights: { simone: 2, arendt: 1, confucius: 1 } } },
+  { id: "q4", prompt: "감정이 크게 흔들릴 때 선호하는 방식은?", optionA: { title: "호흡과 거리두기", subtitle: "반응 시간을 확보한다", next: "q7", weights: { buddha: 2, epictetus: 1, laozi: 1 } }, optionB: { title: "정면 돌파로 의미를 만든다", subtitle: "행동으로 해소한다", next: "q8", weights: { nietzsche: 2, camus: 1, sartre: 1 } } },
+  { id: "q5", prompt: "삶의 기준은 무엇에 더 가까운가요?", optionA: { title: "보편적 기준과 규범", subtitle: "좋은 삶의 기준점", next: "q8", weights: { plato: 2, aristotle: 1, confucius: 1 } }, optionB: { title: "상황 속에서 갱신되는 기준", subtitle: "경험으로 수정", next: "q9", weights: { dewey: 2, camus: 1, simone: 1 } } },
+  { id: "q6", prompt: "사회와 개인의 관계를 볼 때?", optionA: { title: "개인 선택을 우선 본다", subtitle: "주체적 결단", next: "q9", weights: { sartre: 2, nietzsche: 1, epictetus: 1 } }, optionB: { title: "구조와 제도 분석이 먼저다", subtitle: "맥락을 본다", next: "q10", weights: { arendt: 2, simone: 1, confucius: 1 } } },
+  { id: "q7", prompt: "고통을 다룰 때 더 끌리는 문장은?", optionA: { title: "집착을 놓으면 고통이 약해진다", subtitle: "관찰과 이완", next: "q11", weights: { buddha: 2, laozi: 1, spinoza: 1 } }, optionB: { title: "부조리해도 끝까지 살아낸다", subtitle: "반항적 지속", next: "q12", weights: { camus: 2, nietzsche: 1, kierkegaard: 1 } } },
+  { id: "q8", prompt: "성장 방식으로 더 맞는 것은?", optionA: { title: "습관과 훈련의 누적", subtitle: "반복으로 형성", next: "q12", weights: { aristotle: 2, marcus: 1, seneca: 1 } }, optionB: { title: "결정적 전환과 도약", subtitle: "질적 변화", next: "q13", weights: { kierkegaard: 2, nietzsche: 1, sartre: 1 } } },
+  { id: "q9", prompt: "나를 이해하는 방법은?", optionA: { title: "질문으로 전제를 벗긴다", subtitle: "문답과 검증", next: "q13", weights: { socrates: 2, spinoza: 1, plato: 1 } }, optionB: { title: "행동 실험으로 확인한다", subtitle: "해보며 배운다", next: "q14", weights: { dewey: 2, camus: 1, arendt: 1 } } },
+  { id: "q10", prompt: "윤리 판단이 필요할 때?", optionA: { title: "공동체 영향까지 계산", subtitle: "공적 책임", next: "q14", weights: { arendt: 2, confucius: 1, plato: 1 } }, optionB: { title: "내 삶의 진정성 우선", subtitle: "고유성 점검", next: "q15", weights: { heidegger: 2, sartre: 1, kierkegaard: 1 } } },
+  { id: "q11", prompt: "복잡한 감정이 올 때", optionA: { title: "메커니즘을 분석한다", subtitle: "왜 이런지 파악", next: "q15", weights: { spinoza: 2, epictetus: 1, socrates: 1 } }, optionB: { title: "잠시 멈추고 흘려보낸다", subtitle: "과열을 낮춘다", next: "q16", weights: { buddha: 2, laozi: 1, marcus: 1 } } },
+  { id: "q12", prompt: "의미 없는 반복을 느낄 때", optionA: { title: "그래도 오늘을 지속한다", subtitle: "버팀의 리듬", next: "q16", weights: { camus: 2, marcus: 1, epictetus: 1 } }, optionB: { title: "규칙을 다시 쓰고 새로 만든다", subtitle: "창조의 방향", next: "q17", weights: { nietzsche: 2, dewey: 1, sartre: 1 } } },
+  { id: "q13", prompt: "타인의 시선이 부담될 때", optionA: { title: "질문으로 시선의 근거를 해체", subtitle: "논리적 분해", next: "q17", weights: { socrates: 2, spinoza: 1, arendt: 1 } }, optionB: { title: "내 선택의 책임을 수용", subtitle: "주체적 결정", next: "q18", weights: { sartre: 2, kierkegaard: 1, heidegger: 1 } } },
+  { id: "q14", prompt: "현실 문제 해결 전략으로 맞는 것", optionA: { title: "작은 실험 후 수정", subtitle: "피드백 루프", next: "q18", weights: { dewey: 2, arendt: 1, aristotle: 1 } }, optionB: { title: "원칙을 먼저 세우고 집행", subtitle: "기준 선행", next: "q19", weights: { plato: 2, confucius: 1, epictetus: 1 } } },
+  { id: "q15", prompt: "불안이 깊어질수록 나는", optionA: { title: "죽음·유한성을 의식해 우선순위 정리", subtitle: "진정성 점검", next: "q19", weights: { heidegger: 2, camus: 1, marcus: 1 } }, optionB: { title: "관계적 의무와 역할을 재정렬", subtitle: "관계 윤리", next: "q20", weights: { confucius: 2, simone: 1, arendt: 1 } } },
+  { id: "q16", prompt: "회복 방식은 어떤 쪽인가요?", optionA: { title: "내면 정돈", subtitle: "고요·거리두기", next: "q20", weights: { buddha: 2, laozi: 1, epictetus: 1 } }, optionB: { title: "행동 정돈", subtitle: "루틴·실천", next: "q18", weights: { marcus: 2, aristotle: 1, dewey: 1 } } },
+  { id: "q17", prompt: "나는 나를 어떤 방식으로 바꾸는가?", optionA: { title: "기준을 넘어서 재창조", subtitle: "새 가치 만들기", next: "q20", weights: { nietzsche: 2, sartre: 1, camus: 1 } }, optionB: { title: "원칙과 훈련으로 재정비", subtitle: "절제와 정렬", next: "q19", weights: { epictetus: 2, seneca: 1, marcus: 1 } } },
+  { id: "q18", prompt: "마지막으로 더 가까운 신념은?", optionA: { title: "유연함이 지혜다", subtitle: "상황 적응", next: "q20", weights: { laozi: 2, dewey: 1, buddha: 1 } }, optionB: { title: "책임이 자유를 만든다", subtitle: "결정의 무게", next: "q20", weights: { arendt: 1, sartre: 2, simone: 1 } } },
+  { id: "q19", prompt: "나를 지탱하는 핵심 문장은?", optionA: { title: "원칙을 지켜야 내가 선다", subtitle: "규범과 훈련", next: "q20", weights: { plato: 1, aristotle: 2, confucius: 1 } }, optionB: { title: "해석을 바꾸면 삶이 바뀐다", subtitle: "인지 재구성", next: "q20", weights: { spinoza: 2, epictetus: 1, marcus: 1 } } },
+  { id: "q20", prompt: "끝으로, 당신에게 더 맞는 결론은?", optionA: { title: "삶은 이해와 훈련의 연속", subtitle: "정렬된 지속", next: null, weights: { marcus: 2, epictetus: 1, aristotle: 1 } }, optionB: { title: "삶은 불확실 속 선택의 예술", subtitle: "창조적 책임", next: null, weights: { camus: 1, sartre: 2, nietzsche: 1 } } }
+];
+const philosophyQuestionById = Object.fromEntries(PHILOSOPHY_MBTI_QUESTIONS.map((q) => [q.id, q]));
+
+function philosopherPortraitStyle(name = "") {
+  const key = String(name).toLowerCase();
+  const base = {
+    wood1: "#ead8c2",
+    wood2: "#d9b892",
+    wood3: "#c89a6a",
+    hair: "#4c3a2f",
+    outfit: "#5f6b86",
+    beard: false,
+    hairType: "cap",
+    accessory: "none"
+  };
+  if (key.includes("카뮈")) return { ...base, hair: "#4f3a33", outfit: "#53647f", hairType: "cap", accessory: "none" };
+  if (key.includes("니체")) return { ...base, hair: "#5a4037", outfit: "#6a587d", beard: true, hairType: "spike", accessory: "mustache" };
+  if (key.includes("사르트르")) return { ...base, hair: "#47312d", outfit: "#4e5f78", hairType: "side", accessory: "glasses" };
+  if (key.includes("보부아르")) return { ...base, hair: "#2f2a29", outfit: "#775e8a", hairType: "bob", accessory: "earring" };
+  if (key.includes("붓다")) return { ...base, wood1: "#e9d1b4", wood2: "#dbb18b", hair: "#2f2f2f", outfit: "#9a6f56", hairType: "bun", accessory: "none" };
+  if (key.includes("노자")) return { ...base, wood1: "#ead0b2", wood2: "#d4ac84", hair: "#6a6a6a", outfit: "#6b7a69", beard: true, hairType: "long", accessory: "none" };
+  if (key.includes("공자")) return { ...base, hair: "#4a443f", outfit: "#6a5e7e", beard: true, hairType: "topknot", accessory: "none" };
+  if (key.includes("아렌트")) return { ...base, hair: "#3b3433", outfit: "#5f6a84", hairType: "bob", accessory: "earring" };
+  if (key.includes("듀이")) return { ...base, hair: "#6a5f54", outfit: "#4e6e80", hairType: "parted", accessory: "none" };
+  if (key.includes("하이데거")) return { ...base, hair: "#4e4037", outfit: "#616577", hairType: "parted", accessory: "none" };
+  if (key.includes("스피노자")) return { ...base, hair: "#2c2a2a", outfit: "#55667f", hairType: "curly", accessory: "none" };
+  if (key.includes("소크라테스")) return { ...base, hair: "#5a4a42", outfit: "#5a677b", beard: true, hairType: "bald", accessory: "none" };
+  if (key.includes("플라톤")) return { ...base, hair: "#5c4a3f", outfit: "#6a6882", beard: true, hairType: "wavy", accessory: "none" };
+  if (key.includes("아리스토텔레스")) return { ...base, hair: "#59483e", outfit: "#5a6f7d", beard: true, hairType: "side", accessory: "none" };
+  if (key.includes("세네카")) return { ...base, hair: "#6a5749", outfit: "#6f6280", beard: true, hairType: "bald", accessory: "none" };
+  if (key.includes("에픽테토스")) return { ...base, hair: "#52453c", outfit: "#5c687b", beard: true, hairType: "bald", accessory: "none" };
+  return base;
+}
+
+function buildHumanAvatarDataUri(name = "Philosopher") {
+  const trimmed = String(name || "Philosopher").trim();
+  const s = philosopherPortraitStyle(trimmed);
+  const hairShapes = {
+    cap: `<polygon points="108,146 180,92 252,146 252,168 108,168" fill="${s.hair}" />`,
+    spike: `<polygon points="96,156 126,114 156,140 180,102 204,140 234,114 264,156 264,172 96,172" fill="${s.hair}" />`,
+    side: `<polygon points="100,150 176,98 258,146 258,174 100,174" fill="${s.hair}" /><polygon points="214,118 256,146 256,194 214,176" fill="#000" fill-opacity=".12"/>`,
+    bob: `<polygon points="96,152 180,98 264,152 248,238 112,238" fill="${s.hair}" />`,
+    bun: `<polygon points="180,72 200,92 180,112 160,92" fill="${s.hair}" /><polygon points="102,154 180,102 258,154 258,178 102,178" fill="${s.hair}" />`,
+    long: `<polygon points="98,152 180,98 262,152 248,260 112,260" fill="${s.hair}" />`,
+    topknot: `<polygon points="180,66 194,82 180,98 166,82" fill="${s.hair}" /><polygon points="104,154 180,102 256,154 256,184 104,184" fill="${s.hair}" />`,
+    parted: `<polygon points="98,152 180,98 262,152 262,176 98,176" fill="${s.hair}"/><line x1="180" y1="102" x2="180" y2="168" stroke="#fff" stroke-opacity=".24" stroke-width="4"/>`,
+    curly: `<polygon points="98,152 180,98 262,152 262,176 98,176" fill="${s.hair}"/><circle cx="124" cy="128" r="10" fill="${s.hair}"/><circle cx="236" cy="128" r="10" fill="${s.hair}"/>`,
+    wavy: `<polygon points="98,152 180,98 262,152 262,176 98,176" fill="${s.hair}"/><path d="M116 146c18-10 36-16 64-16s46 6 64 16" stroke="#fff" stroke-opacity=".2" stroke-width="5" fill="none"/>`,
+    bald: `<polygon points="118,158 180,122 242,158 242,172 118,172" fill="${s.hair}" fill-opacity=".35"/>`
+  };
+  const accessoryShapes = {
+    none: "",
+    glasses: `<rect x="134" y="184" width="30" height="22" rx="4" fill="none" stroke="#33485c" stroke-width="3"/><rect x="196" y="184" width="30" height="22" rx="4" fill="none" stroke="#33485c" stroke-width="3"/><line x1="164" y1="195" x2="196" y2="195" stroke="#33485c" stroke-width="3"/>`,
+    earring: `<circle cx="124" cy="214" r="4" fill="${s.wood3}" /><circle cx="236" cy="214" r="4" fill="${s.wood3}" />`,
+    mustache: `<path d="M150 226c8 10 16 10 24 0M186 226c8 10 16 10 24 0" stroke="${s.hair}" stroke-width="4" stroke-linecap="round" fill="none"/>`
+  };
+  const beard = s.beard
+    ? `<polygon points="140,238 180,276 220,238 208,264 180,286 152,264" fill="${s.hair}" fill-opacity=".9"/>`
+    : "";
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="360" height="420" viewBox="0 0 360 420" role="img" aria-label="${escapeHtml(trimmed)}">
+      <defs>
+        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#f5eee6" />
+          <stop offset="100%" stop-color="#ecdcc8" />
+        </linearGradient>
+      </defs>
+      <rect width="360" height="420" fill="url(#g)" />
+      <rect x="32" y="34" width="296" height="352" rx="40" fill="#fffdfb" fill-opacity="0.74" />
+      <ellipse cx="180" cy="350" rx="94" ry="18" fill="#2f4858" fill-opacity=".08" />
+      <polygon points="96,372 180,286 264,372" fill="${s.outfit}" />
+      <polygon points="124,372 180,316 236,372" fill="${s.wood3}" fill-opacity=".42" />
+      <polygon points="180,122 242,156 242,236 180,270 118,236 118,156" fill="${s.wood1}" />
+      <polygon points="180,140 226,164 226,224 180,250 134,224 134,164" fill="${s.wood2}" fill-opacity=".48" />
+      ${hairShapes[s.hairType] || hairShapes.short}
+      ${accessoryShapes[s.accessory] || ""}
+      <circle cx="156" cy="196" r="5" fill="#2f4858" />
+      <circle cx="204" cy="196" r="5" fill="#2f4858" />
+      <polygon points="180,198 188,214 172,214" fill="#9c7f65"/>
+      <path d="M160 228c8 8 14 10 20 10s12-2 20-10" stroke="#815a4a" stroke-width="4" stroke-linecap="round" fill="none"/>
+      ${beard}
+      <text x="180" y="404" text-anchor="middle" font-size="22" font-family="Noto Sans KR, Manrope, sans-serif" font-weight="800" fill="#2f4858">${escapeHtml(trimmed)}</text>
+    </svg>
+  `;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
+function setPhilosopherImage(imgEl, src, name) {
+  if (!imgEl) return;
+  imgEl.src = buildHumanAvatarDataUri(name);
+}
+
+function supplementalConceptsFor(philosopher) {
+  return [
+    {
+      id: "value-reframe",
+      title: "가치 재정의",
+      summary: "지금의 기준을 다시 정리해 방향을 선명하게 한다.",
+      benefit: `${philosopher.name}의 관점에서 중요한 가치의 우선순위를 다시 잡아, 흔들릴 때 판단 기준을 빠르게 회복합니다.`,
+      shadow: "기준을 급격히 바꾸면 기존 관계나 루틴과 충돌할 수 있습니다.",
+      recovery: "기준을 전면 교체하지 말고, 1~2주 단위로 작은 행동 규칙부터 바꿔 정착률을 높입니다.",
+      alternative: "듀이식 접근으로 작은 실험 단위를 만들어 부작용을 검증하며 이동할 수 있습니다."
+    },
+    {
+      id: "relational-balance",
+      title: "관계 균형 재배치",
+      summary: "자기 기준과 타인 배려의 비율을 조정한다.",
+      benefit: "갈등 상황에서도 자책 또는 타인탓으로 치우치지 않고 균형점을 찾기 쉬워집니다.",
+      shadow: "지나친 균형 추구는 결정 지연을 만들 수 있습니다.",
+      recovery: "우선순위 1개만 먼저 확정하고, 관계 조율은 그다음 순서로 분리해 진행합니다.",
+      alternative: "아렌트처럼 책임 범위를 명확히 구획하면 피로를 줄일 수 있습니다."
+    },
+    {
+      id: "recovery-rhythm",
+      title: "회복 리듬 설계",
+      summary: "생각 정리와 실행 복귀의 리듬을 만든다.",
+      benefit: "철학적 성찰이 실제 생활 개선으로 연결될 확률이 올라갑니다.",
+      shadow: "리듬이 깨졌을 때 다시 무기력해질 수 있습니다.",
+      recovery: "실패한 날을 예외 처리하지 말고 다음 슬롯에 즉시 복귀해 연속성을 회복합니다.",
+      alternative: "마르쿠스식 짧은 기록 + 즉시 행동 1개 작성 방식이 복귀를 돕습니다."
+    }
+  ];
+}
+
+function supplementalDislikesFor(philosopher) {
+  return [
+    {
+      id: "too-abstract",
+      label: "너무 추상적이라 현실에 적용이 어려워요",
+      response: `${philosopher.name}의 개념은 문장보다 행동 단위로 번역할 때 효과가 커집니다. 오늘 1개 행동으로 줄이면 적용성이 올라갑니다.`,
+      alt: "듀이: 원칙 대신 작은 실험으로 바로 적용해 본다."
+    },
+    {
+      id: "too-heavy",
+      label: "너무 무겁고 부담이 커져요",
+      response: "철학을 정답으로 쓰면 압박이 커집니다. 임시 가설로 두고 일상 기능 회복을 먼저 잡는 편이 안전합니다.",
+      alt: "노자: 개입 강도를 낮추고 회복 에너지를 먼저 확보한다."
+    },
+    {
+      id: "too-slow",
+      label: "생각이 길어져 실행이 늦어져요",
+      response: "해석 시간과 실행 시간을 분리하면 지연이 줄어듭니다. 10분 해석 후 20분 행동 슬롯처럼 고정하세요.",
+      alt: "아리스토텔레스: 충분히 좋은 기준으로 먼저 실행하고 수정한다."
+    },
+    {
+      id: "does-not-fit-me",
+      label: "나랑 결이 안 맞는 느낌이에요",
+      response: "결과는 고정 진단이 아니라 현재 선택 경향의 스냅샷입니다. 불편한 지점 체크 후 보정 해석을 참고해 재시작하면 정확도가 올라갑니다.",
+      alt: "사르트르: 현재의 선택을 다시 고르면 결과도 바뀔 수 있다."
+    }
+  ];
+}
+
+function getDisplayConcepts(philosopher) {
+  const base = Array.isArray(philosopher?.concepts) ? [...philosopher.concepts] : [];
+  const seen = new Set(base.map((item) => item.id));
+  supplementalConceptsFor(philosopher).forEach((item) => {
+    if (base.length >= 5) return;
+    if (seen.has(item.id)) return;
+    base.push(item);
+    seen.add(item.id);
+  });
+  return base.slice(0, Math.max(PHILOSOPHY_MBTI_MIN_CONCEPTS, Math.min(5, base.length)));
+}
+
+function getDisplayDislikes(philosopher) {
+  const base = Array.isArray(philosopher?.dislikes) ? [...philosopher.dislikes] : [];
+  const seen = new Set(base.map((item) => item.id));
+  supplementalDislikesFor(philosopher).forEach((item) => {
+    if (base.length >= 5) return;
+    if (seen.has(item.id)) return;
+    base.push(item);
+    seen.add(item.id);
+  });
+  return base.slice(0, Math.max(PHILOSOPHY_MBTI_MIN_DISLIKES, Math.min(5, base.length)));
+}
 
 function createPhilosophyMbtiState() {
-  const bracket = PHILOSOPHY_MBTI_OPENING_BRACKET.map((id) => philosophyMbtiById[id]).filter(Boolean);
+  const scores = Object.fromEntries(PHILOSOPHY_MBTI_POOL.map((item) => [item.id, 0]));
   return {
-    round: 1,
-    pairIndex: 0,
-    selections: 0,
-    bracket,
-    winners: [],
-    result: null
+    currentQuestionId: "q1",
+    answers: [],
+    scores,
+    result: null,
+    done: false,
+    visited: new Set(["q1"])
   };
 }
 
-function currentPhilosophyPair() {
-  if (!philosophyMbtiState || philosophyMbtiState.result) return [null, null];
-  const offset = philosophyMbtiState.pairIndex * 2;
-  return [philosophyMbtiState.bracket[offset] || null, philosophyMbtiState.bracket[offset + 1] || null];
+function buildCompletedPhilosophyMbtiState(resultId) {
+  const winner = philosophyMbtiById[resultId];
+  if (!winner) return null;
+  const state = createPhilosophyMbtiState();
+  state.done = true;
+  state.result = winner;
+  state.currentQuestionId = null;
+  state.answers = Array.from({ length: PHILOSOPHY_MBTI_MAX_QUESTIONS }, (_, index) => ({
+    questionId: `saved-${index + 1}`,
+    picked: "A"
+  }));
+  return state;
 }
 
-function renderPhilosophyOptionCard(target, philosopher, label) {
+function loadSavedPhilosophyMbtiState() {
+  try {
+    const raw = localStorage.getItem(MBTI_RESULT_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed?.done || typeof parsed.resultId !== "string") return null;
+    return buildCompletedPhilosophyMbtiState(parsed.resultId);
+  } catch {
+    return null;
+  }
+}
+
+function savePhilosophyMbtiResult(resultId) {
+  if (!resultId) return;
+  localStorage.setItem(
+    MBTI_RESULT_STORAGE_KEY,
+    JSON.stringify({
+      done: true,
+      resultId,
+      savedAt: new Date().toISOString()
+    })
+  );
+}
+
+function clearSavedPhilosophyMbtiResult() {
+  localStorage.removeItem(MBTI_RESULT_STORAGE_KEY);
+}
+
+function currentPhilosophyQuestion() {
+  if (!philosophyMbtiState || philosophyMbtiState.done) return null;
+  return philosophyQuestionById[philosophyMbtiState.currentQuestionId] || null;
+}
+
+function renderPhilosophyOptionCard(target, option, label) {
   if (!target) return;
-  if (!philosopher) {
-    target.innerHTML = `<strong class="mbti-name">토너먼트 종료</strong><p class="mbti-angle">다시 테스트를 눌러 새로운 매치를 시작하세요.</p>`;
+  if (!option) {
+    target.innerHTML = `<strong class="mbti-name">질문이 종료되었습니다</strong>`;
     target.disabled = true;
     return;
   }
   target.disabled = false;
   target.innerHTML = `
     <span class="mbti-option-label">${escapeHtml(label || "Option")}</span>
-    <div class="mbti-choice-image-wrap">
-      <img class="mbti-choice-image" src="${escapeHtml(philosopher.image)}" alt="${escapeHtml(philosopher.name)}" loading="lazy" />
-    </div>
-    <p class="mbti-school">${escapeHtml(philosopher.school)}</p>
-    <strong class="mbti-name">${escapeHtml(philosopher.name)}</strong>
-    <p class="mbti-angle">${escapeHtml(philosopher.angle)}</p>
-    <p class="mbti-choice-quote">"${escapeHtml(philosopher.quote)}"</p>
+    <strong class="mbti-name">${escapeHtml(option.title)}</strong>
+    <p class="mbti-angle">${escapeHtml(option.subtitle)}</p>
   `;
+}
+
+function finalizePhilosophyMbti() {
+  const scoreEntries = Object.entries(philosophyMbtiState.scores || {});
+  if (!scoreEntries.length) return;
+  scoreEntries.sort((a, b) => b[1] - a[1]);
+  const [winnerId] = scoreEntries[0];
+  philosophyMbtiState.result = philosophyMbtiById[winnerId] || PHILOSOPHY_MBTI_POOL[0];
+  philosophyMbtiState.done = true;
+  savePhilosophyMbtiResult(winnerId);
+  const concepts = getDisplayConcepts(philosophyMbtiState.result);
+  activePhilosophyConceptId = concepts[0]?.id || "";
+  selectedPhilosophyDislikes.clear();
 }
 
 function renderPhilosophyDetail() {
@@ -1475,14 +2353,16 @@ function renderPhilosophyDetail() {
     return;
   }
 
-  const concept = winner.concepts.find((item) => item.id === activePhilosophyConceptId) || winner.concepts[0];
+  const concepts = getDisplayConcepts(winner);
+  const dislikes = getDisplayDislikes(winner);
+  const concept = concepts.find((item) => item.id === activePhilosophyConceptId) || concepts[0];
   if (!concept) {
     philoMbti.detailPanel.innerHTML = `<p class="helper-copy">표시할 해석 항목이 없습니다.</p>`;
     return;
   }
 
   philoMbti.detailTitle.textContent = concept.title;
-  const dislikeBlocks = winner.dislikes
+  const dislikeBlocks = dislikes
     .filter((item) => selectedPhilosophyDislikes.has(item.id))
     .map(
       (item) => `
@@ -1514,30 +2394,27 @@ function renderPhilosophyDetail() {
 }
 
 function renderPhilosophyResult() {
-  if (!philoMbti.resultName || !philoMbti.resultMeta || !philoMbti.resultQuote || !philoMbti.resultImage) return;
   const winner = philosophyMbtiState?.result;
   if (!winner) {
-    philoMbti.resultName.textContent = "아직 결과가 정해지지 않았어요";
-    philoMbti.resultMeta.textContent = "토너먼트를 진행하면 여기에 닮은 철학자가 나타납니다.";
-    philoMbti.resultQuote.textContent = "";
-    philoMbti.resultImage.src = "./assets/philosophers/epictetus.svg";
     if (philoMbti.checklist) philoMbti.checklist.innerHTML = `<p class="helper-copy">결과가 정해지면 체크리스트가 열립니다.</p>`;
     if (philoMbti.dislikeChecklist) philoMbti.dislikeChecklist.innerHTML = "";
+    if (philoMbti.typeChart) philoMbti.typeChart.innerHTML = "";
+    if (philoMbti.typeInsight) philoMbti.typeInsight.textContent = "";
+    if (philoMbti.browsePanel) philoMbti.browsePanel.classList.add("is-hidden");
     renderPhilosophyDetail();
     return;
   }
 
-  philoMbti.resultName.textContent = winner.name;
-  philoMbti.resultMeta.textContent = `${winner.school} · ${winner.angle}`;
-  philoMbti.resultQuote.textContent = winner.quote;
-  philoMbti.resultImage.src = winner.image;
+  philosophyBrowseIndex = Math.max(0, PHILOSOPHY_MBTI_POOL.findIndex((item) => item.id === winner.id));
+  const concepts = getDisplayConcepts(winner);
+  const dislikes = getDisplayDislikes(winner);
 
-  if (!activePhilosophyConceptId || !winner.concepts.some((item) => item.id === activePhilosophyConceptId)) {
-    activePhilosophyConceptId = winner.concepts[0]?.id || "";
+  if (!activePhilosophyConceptId || !concepts.some((item) => item.id === activePhilosophyConceptId)) {
+    activePhilosophyConceptId = concepts[0]?.id || "";
   }
 
   if (philoMbti.checklist) {
-    philoMbti.checklist.innerHTML = winner.concepts
+    philoMbti.checklist.innerHTML = concepts
       .map(
         (item) => `
           <button class="mbti-check-item${item.id === activePhilosophyConceptId ? " is-active" : ""}" type="button" data-mbti-concept="${item.id}">
@@ -1550,7 +2427,7 @@ function renderPhilosophyResult() {
   }
 
   if (philoMbti.dislikeChecklist) {
-    philoMbti.dislikeChecklist.innerHTML = winner.dislikes
+    philoMbti.dislikeChecklist.innerHTML = dislikes
       .map(
         (item) => `
           <label class="mbti-dislike-item">
@@ -1563,53 +2440,134 @@ function renderPhilosophyResult() {
   }
 
   renderPhilosophyDetail();
+  renderPhilosophyBrowsePanel();
+  renderPhilosophyTypeChart();
 }
 
 function renderPhilosophyMbti() {
   if (!philosophyMbtiState) {
-    philosophyMbtiState = createPhilosophyMbtiState();
+    philosophyMbtiState = loadSavedPhilosophyMbtiState() || createPhilosophyMbtiState();
   }
   if (!philoMbti.prompt || !philoMbti.progress) return;
 
-  const [a, b] = currentPhilosophyPair();
-  const completed = philosophyMbtiState.selections;
-  philoMbti.progress.textContent = `${completed} / ${PHILOSOPHY_MBTI_TOTAL_CHOICES}`;
+  const question = currentPhilosophyQuestion();
+  const step = philosophyMbtiState.answers.length + 1;
+  const completed = philosophyMbtiState.answers.length;
+  philoMbti.progress.textContent = philosophyMbtiState.done
+    ? `완료 · ${PHILOSOPHY_MBTI_MAX_QUESTIONS} 문항`
+    : `Question ${Math.min(step, PHILOSOPHY_MBTI_MAX_QUESTIONS)} / ${PHILOSOPHY_MBTI_MAX_QUESTIONS}`;
   if (philoMbti.progressBar) {
-    philoMbti.progressBar.style.width = `${(completed / PHILOSOPHY_MBTI_TOTAL_CHOICES) * 100}%`;
+    philoMbti.progressBar.style.width = `${(completed / PHILOSOPHY_MBTI_MAX_QUESTIONS) * 100}%`;
   }
-  philoMbti.prompt.textContent = philosophyMbtiState.result
-    ? "테스트 완료 · 아래 결과와 보정 해석을 확인해보세요"
-    : `Round ${philosophyMbtiState.round} · 더 가까운 주장 하나를 선택하세요 (${completed + 1} / ${PHILOSOPHY_MBTI_TOTAL_CHOICES})`;
+  philoMbti.prompt.textContent = question?.prompt || "질문을 불러오는 중입니다.";
 
-  renderPhilosophyOptionCard(philoMbti.optionA, a, "Option Alpha");
-  renderPhilosophyOptionCard(philoMbti.optionB, b, "Option Beta");
+  renderPhilosophyOptionCard(philoMbti.optionA, question?.optionA, "Option A");
+  renderPhilosophyOptionCard(philoMbti.optionB, question?.optionB, "Option B");
+
+  if (philoMbti.questionSection) philoMbti.questionSection.classList.toggle("is-hidden", philosophyMbtiState.done);
+  if (philoMbti.optionGrid) philoMbti.optionGrid.classList.toggle("is-hidden", philosophyMbtiState.done);
+  if (philoMbti.browsePanel) philoMbti.browsePanel.classList.toggle("is-hidden", !philosophyMbtiState.done);
+  if (philoMbti.bottomGrid) philoMbti.bottomGrid.classList.toggle("is-hidden", !philosophyMbtiState.done);
   renderPhilosophyResult();
 }
 
 function choosePhilosophyMbti(optionIndex) {
-  if (!philosophyMbtiState || philosophyMbtiState.result) return;
-  const [a, b] = currentPhilosophyPair();
-  if (!a || !b) return;
-  const winner = optionIndex === 0 ? a : b;
-  philosophyMbtiState.winners.push(winner);
-  philosophyMbtiState.selections += 1;
-  philosophyMbtiState.pairIndex += 1;
+  if (!philosophyMbtiState || philosophyMbtiState.done) return;
+  const question = currentPhilosophyQuestion();
+  if (!question) {
+    finalizePhilosophyMbti();
+    renderPhilosophyMbti();
+    return;
+  }
+  const selected = optionIndex === 0 ? question.optionA : question.optionB;
+  if (!selected) return;
+  Object.entries(selected.weights || {}).forEach(([id, weight]) => {
+    philosophyMbtiState.scores[id] = (philosophyMbtiState.scores[id] || 0) + Number(weight || 0);
+  });
+  philosophyMbtiState.answers.push({ questionId: question.id, picked: optionIndex === 0 ? "A" : "B" });
 
-  const isRoundDone = philosophyMbtiState.pairIndex * 2 >= philosophyMbtiState.bracket.length;
-  if (isRoundDone) {
-    if (philosophyMbtiState.winners.length === 1) {
-      philosophyMbtiState.result = philosophyMbtiState.winners[0];
-      activePhilosophyConceptId = philosophyMbtiState.result.concepts[0]?.id || "";
-      selectedPhilosophyDislikes.clear();
+  const reachedMax = philosophyMbtiState.answers.length >= PHILOSOPHY_MBTI_MAX_QUESTIONS;
+  let nextId = selected.next;
+  if (!nextId || reachedMax) {
+    finalizePhilosophyMbti();
+  } else {
+    if (philosophyMbtiState.visited.has(nextId) && philosophyMbtiState.answers.length >= 12) {
+      finalizePhilosophyMbti();
     } else {
-      philosophyMbtiState.bracket = philosophyMbtiState.winners.slice();
-      philosophyMbtiState.winners = [];
-      philosophyMbtiState.pairIndex = 0;
-      philosophyMbtiState.round += 1;
+      philosophyMbtiState.currentQuestionId = nextId;
+      philosophyMbtiState.visited.add(nextId);
     }
   }
 
   renderPhilosophyMbti();
+}
+
+function renderPhilosophyBrowsePanel() {
+  if (!philoMbti.browsePanel || !philoMbti.browseImage) return;
+  const list = PHILOSOPHY_MBTI_POOL;
+  if (!list.length) return;
+  const safeIndex = ((philosophyBrowseIndex % list.length) + list.length) % list.length;
+  philosophyBrowseIndex = safeIndex;
+  const current = list[safeIndex];
+  setPhilosopherImage(philoMbti.browseImage, current.image, current.name);
+  philoMbti.browseName.textContent = current.name;
+  philoMbti.browseSchool.textContent = current.school;
+  philoMbti.browseQuote.textContent = current.quote;
+  philoMbti.browseAngle.textContent = current.angle;
+}
+
+function renderPhilosophyTypeChart() {
+  if (!philoMbti.typeChart) return;
+  const winner = philosophyMbtiState?.result;
+  const knownRanks = Object.values(PUBLIC_INFLUENCE_RANK_BY_ID).filter((value) => Number.isFinite(value));
+  const maxKnownRank = Math.max(...knownRanks, 1);
+  const ranked = PHILOSOPHY_MBTI_POOL.map((item) => {
+    const rank = Number(PUBLIC_INFLUENCE_RANK_BY_ID[item.id]);
+    const isKnown = Number.isFinite(rank) && rank > 0;
+    const normalized = isKnown ? (maxKnownRank - rank + 1) / maxKnownRank : 0.12;
+    // Keep the bars visually comparable while preserving ordering.
+    const compressed = isKnown ? 0.4 + Math.pow(normalized, 0.58) * 0.6 : 0.42;
+    return {
+      id: item.id,
+      name: item.name,
+      rank: isKnown ? rank : null,
+      sortRank: isKnown ? rank : 9999,
+      width: Math.round(Math.max(12, Math.min(100, compressed * 100)))
+    };
+  }).sort((a, b) => a.sortRank - b.sortRank || a.name.localeCompare(b.name, "ko"));
+
+  if (!ranked.length) {
+    philoMbti.typeChart.innerHTML = "";
+    return;
+  }
+
+  philoMbti.typeChart.innerHTML = ranked
+    .map((item, index) => {
+      return `
+        <div class="mbti-type-row${index === 0 ? " is-top" : ""}${winner?.id === item.id ? " is-selected" : ""}">
+          <span class="mbti-type-label">${escapeHtml(item.name)}</span>
+          <span class="mbti-type-track">
+            <span class="mbti-type-fill" style="--bar-width: ${item.width}%;"></span>
+          </span>
+        </div>
+      `;
+    })
+    .join("");
+
+  if (!philoMbti.typeInsight || !winner) return;
+  const winnerItem = ranked.find((item) => item.id === winner.id);
+  if (!winnerItem) {
+    philoMbti.typeInsight.textContent = "공개 영향도 기준 정보를 찾지 못했습니다.";
+    return;
+  }
+  if (!winnerItem.rank) {
+    philoMbti.typeInsight.textContent = `${winner.name}은(는) 현재 참고한 공개 연구 표본에 직접 포함되지 않아, 비교상 희소권으로 표시됩니다.`;
+    return;
+  }
+
+  const band = winnerItem.rank <= 45 ? "다수권" : winnerItem.rank <= 95 ? "중간권" : "희소권";
+  const topType = ranked[0]?.name || "";
+  philoMbti.typeInsight.textContent = `${winner.name}은(는) 공개 영향도 기준 ${band}입니다. 최상위는 ${topType}입니다.`;
 }
 
 function matchesSearch(entry, query) {
@@ -1636,14 +2594,63 @@ function matchesSearch(entry, query) {
 function pickPhilosopherQuote(entry, philosopher) {
   const quotes = philosopher?.quotes || [];
   if (!quotes.length) return "";
+  const hashSeed = (text) => {
+    let seed = 0;
+    for (let index = 0; index < text.length; index += 1) {
+      seed = (seed + text.charCodeAt(index) * (index + 3)) % 9973;
+    }
+    return seed;
+  };
+
+  const quoteIntentScore = (quote, signals) => {
+    const text = String(quote || "").toLowerCase();
+    let score = 0;
+    if (signals.overload && /(판단|통제|원하라|사건)/.test(text)) score += 3;
+    if (signals.choice && /(선택|자유|행동|의미)/.test(text)) score += 3;
+    if (signals.hopeless && /(현재|관대함|견딜|진실|여름)/.test(text)) score += 3;
+    if (signals.time && /(현재|여름|계속|진실)/.test(text)) score += 2;
+    if (signals.connection && /(관대함|현재|의미)/.test(text)) score += 2;
+    if (/(현재|자유|의미|통제|행동|진실|견딜)/.test(text)) score += 1;
+    return score;
+  };
+
+  const fallbackSeedBase = `${new Date().toISOString().slice(0, 10)}-${philosopher.name}`;
   const seedBase = entry
-    ? `${entry.date}-${entry.title}-${entry.tags?.join("|") || ""}-${entry.riskLevel || ""}`
-    : `${new Date().toISOString().slice(0, 10)}-${philosopher.name}`;
-  let seed = 0;
-  for (let index = 0; index < seedBase.length; index += 1) {
-    seed = (seed + seedBase.charCodeAt(index) * (index + 3)) % 9973;
+    ? `${entry.id || ""}-${entry.date || ""}-${entry.title || ""}-${entry.tags?.join("|") || ""}-${entry.riskLevel || ""}`
+    : fallbackSeedBase;
+  const seed = hashSeed(seedBase);
+
+  if (!entry) {
+    return quotes[seed % quotes.length];
   }
-  return quotes[seed % quotes.length];
+
+  const textPool = `${entry.title || ""} ${entry.excerpt || ""} ${entry.body?.join(" ") || ""} ${(entry.tags || []).join(" ")}`;
+  const signals = detectSignals(textPool, entry.tags || []);
+  const recentSamePhilosopher = entries
+    .filter((item) => item.id !== entry.id && item.philosophyKey === entry.philosophyKey)
+    .sort(compareEntriesDesc)
+    .slice(0, 2);
+  const recentQuoteIndexes = new Set(
+    recentSamePhilosopher.map((item) => {
+      const recentSeed = hashSeed(`${item.id || ""}-${item.date || ""}-${item.title || ""}-${(item.tags || []).join("|") || ""}-${item.riskLevel || ""}`);
+      return recentSeed % quotes.length;
+    })
+  );
+
+  const ranked = quotes
+    .map((quote, index) => ({
+      index,
+      quote,
+      score: quoteIntentScore(quote, signals),
+      offset: Math.abs(index - (seed % quotes.length))
+    }))
+    .sort((a, b) => {
+      if (a.score !== b.score) return b.score - a.score;
+      return a.offset - b.offset;
+    });
+
+  const selected = ranked.find((item) => !recentQuoteIndexes.has(item.index)) || ranked[0];
+  return selected?.quote || quotes[seed % quotes.length];
 }
 
 function inferTagsFromBody(bodyText = "") {
@@ -1706,16 +2713,109 @@ function renderTags(container, tags) {
   });
 }
 
-function findAnniversaryEntry() {
+function formatMonthTag(date) {
+  return `${String(date.getFullYear()).slice(2)}.${String(date.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function formatYmd(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function formatCommentStamp(value) {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "-";
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hour = String(date.getHours()).padStart(2, "0");
+  const minute = String(date.getMinutes()).padStart(2, "0");
+  return `${month}.${day} ${hour}:${minute}`;
+}
+
+function heatmapRangeForYearSpan() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const visibleStart = new Date(year, 0, 1);
+  const visibleEnd = new Date(year + 1, 9, 31);
+  const gridStart = startOfWeek(visibleStart);
+  const gridEnd = addDays(startOfWeek(addDays(visibleEnd, 6)), 6);
+  return { visibleStart, visibleEnd, gridStart, gridEnd };
+}
+
+function philosopherToneLabel(key) {
+  const map = {
+    camus: "카뮈",
+    nietzsche: "니체",
+    epictetus: "에픽테토스",
+    sartre: "사르트르"
+  };
+  return map[key] || "철학";
+}
+
+function philosopherKeyByName(name) {
+  const target = String(name || "").trim();
+  return Object.entries(philosopherCatalog).find(([, value]) => value.name === target)?.[0] || "";
+}
+
+function opposingCritique(entry) {
+  const map = {
+    camus: {
+      critic: "니체",
+      text: "의미를 오래 붙잡고 버티는 게, 그만큼 진지했다는 뜻이구나. 근데 오늘은 작은 선택 하나라도 네 쪽으로 움직여 보는 게 더 좋아."
+    },
+    nietzsche: {
+      critic: "에픽테토스",
+      text: "스스로를 바꾸려는 힘은 참 좋다. 근데 네가 못 바꾸는 것까지 붙잡으면 더 지치니까, 먼저 네가 바로 다룰 수 있는 것부터 정리하는 게 좋아."
+    },
+    epictetus: {
+      critic: "사르트르",
+      text: "침착하게 버티는 게 네 장점인 건 맞아. 근데 너무 안전한 쪽만 고르면 중요한 결정이 늦어지니까, 오늘은 네 선택 하나를 분명히 남기는 게 좋아."
+    },
+    sartre: {
+      critic: "카뮈",
+      text: "자유와 책임을 크게 느끼는 건 그만큼 성실하다는 뜻이야. 근데 완벽한 답 찾느라 오늘을 미루면 더 힘들어지니까, 지금 가능한 하루 루틴부터 붙이는 게 좋아."
+    }
+  };
+  return map[entry.philosophyKey] || { critic: "다른 철학자", text: "이 정도로 적어낸 건 이미 잘한 거야. 근데 내일 바로 해볼 수 있는 행동 하나를 붙이면 훨씬 단단해져." };
+}
+
+function latestMarkerInfo() {
+  const globalSorted = [...entries].sort(compareEntriesDesc);
+  const latestDate = globalSorted[0]?.date || "";
+  if (!latestDate) {
+    return { latestDate: "", latestDayIds: new Set(), latestTopTwoIds: new Set() };
+  }
+  const latestDayEntries = globalSorted.filter((entry) => entry.date === latestDate);
+  return {
+    latestDate,
+    latestDayIds: new Set(latestDayEntries.map((entry) => entry.id)),
+    latestTopTwoIds: new Set(latestDayEntries.slice(0, 2).map((entry) => entry.id))
+  };
+}
+
+function anniversaryEntriesForOneYearAgo() {
   const today = new Date();
   const monthDay = `${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
   const targetYear = String(today.getFullYear() - 1);
   return entries
-    .find((entry) => entry.date.startsWith(`${targetYear}-${monthDay}`));
+    .filter((entry) => entry.date.startsWith(`${targetYear}-${monthDay}`))
+    .sort(compareEntriesDesc);
+}
+
+function toneClassByPhilosophyKeys(keys) {
+  if (keys.length >= 2) return "tone-mixed";
+  const one = keys[0];
+  return one ? `tone-${one}` : "";
 }
 
 function renderAnniversaryCard() {
-  const entry = findAnniversaryEntry();
+  const entriesForDay = anniversaryEntriesForOneYearAgo();
+  const entry = entriesForDay[0] || null;
+  const keys = Array.from(new Set(entriesForDay.map((item) => item.philosophyKey)));
+  anniversaryCard.classList.remove("tone-camus", "tone-nietzsche", "tone-epictetus", "tone-sartre", "tone-mixed");
+  if (keys.length) {
+    anniversaryCard.classList.add(toneClassByPhilosophyKeys(keys));
+  }
   if (!entry) {
     anniversaryCard.classList.add("is-empty");
     anniversaryTitle.textContent = "아직 1년 전 오늘의 글이 없습니다";
@@ -1729,7 +2829,8 @@ function renderAnniversaryCard() {
   anniversaryTitle.textContent = entry.title;
   anniversaryDate.textContent = entry.date;
   anniversaryExcerpt.textContent = entry.excerpt;
-  renderTags(anniversaryTags, [philosopherCatalog[entry.philosophyKey]?.name || "철학", ...entry.tags]);
+  const names = keys.map((item) => philosopherCatalog[item]?.name || item);
+  renderTags(anniversaryTags, [...names, ...entry.tags]);
 }
 
 function startOfWeek(date) {
@@ -1754,19 +2855,23 @@ function ymd(date) {
   return `${y}-${m}-${d}`;
 }
 
-function monthLabel(date) {
-  return `${date.getMonth() + 1}월`;
-}
-
 function renderJournalHeatmap() {
   if (!journalHeatmap || !heatmapMonths) return;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const end = new Date(today);
-  const start = startOfWeek(addDays(end, -364));
+  const todayKey = ymd(today);
+  const range = heatmapRangeForYearSpan();
+  const start = range.gridStart;
+  const end = range.gridEnd;
+  const totalDays = Math.floor((end.getTime() - start.getTime()) / 86400000) + 1;
+  const totalWeeks = Math.ceil(totalDays / 7);
 
   const counts = entries.reduce((acc, entry) => {
-    acc[entry.date] = (acc[entry.date] || 0) + 1;
+    if (!acc[entry.date]) {
+      acc[entry.date] = { count: 0, philosopherKeys: new Set() };
+    }
+    acc[entry.date].count += 1;
+    acc[entry.date].philosopherKeys.add(entry.philosophyKey);
     return acc;
   }, {});
 
@@ -1774,24 +2879,41 @@ function renderJournalHeatmap() {
   const monthMarkers = [];
   let cursor = new Date(start);
 
-  for (let week = 0; week < 53; week += 1) {
+  for (let week = 0; week < totalWeeks; week += 1) {
     const weekStart = addDays(start, week * 7);
-    const monthStartInWeek = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index)).find((date) => date.getDate() === 1);
-    monthMarkers.push(`<span>${monthStartInWeek ? monthLabel(monthStartInWeek) : ""}</span>`);
+    const monthStartInWeek = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index)).find(
+      (date) => date.getDate() === 1 && ymd(date) >= formatYmd(range.visibleStart) && ymd(date) <= formatYmd(range.visibleEnd)
+    );
+    monthMarkers.push(`<span>${monthStartInWeek ? formatMonthTag(monthStartInWeek) : ""}</span>`);
 
     for (let day = 0; day < 7; day += 1) {
       const cellDate = new Date(cursor);
       const key = ymd(cellDate);
-      const count = counts[key] || 0;
-      const level = count >= 4 ? 4 : count >= 3 ? 3 : count >= 2 ? 2 : count >= 1 ? 1 : 0;
-      const title = `${key} · ${count ? `${count}개 기록` : "기록 없음"}`;
+      const isOutside = key < formatYmd(range.visibleStart) || key > formatYmd(range.visibleEnd);
+      const isFuture = key > todayKey;
+      const stat = !isOutside && !isFuture ? counts[key] || null : null;
+      const count = stat ? stat.count : 0;
+      const keys = stat ? Array.from(stat.philosopherKeys) : [];
+      const isMultiPhilosopher = keys.length >= 2;
+      const singleKey = keys[0] || "";
+      const nameLabel = keys.map((item) => philosopherCatalog[item]?.name || item).join(", ");
+      const title = isOutside
+        ? `${key} · 범위 외 날짜`
+        : isFuture
+        ? `${key} · 아직 오지 않은 날짜`
+        : `${key} · ${count ? `${count}개 기록` : "기록 없음"}${nameLabel ? ` · ${nameLabel}` : ""}`;
       cells.push(
-        `<span class="heatmap-cell${level ? ` level-${level}` : ""}${key === ymd(today) ? " today" : ""}" title="${title}" aria-label="${title}"></span>`
+        `<span class="heatmap-cell${singleKey && !isMultiPhilosopher ? ` philo-${singleKey}` : ""}${isMultiPhilosopher ? " philo-mixed is-multi" : ""}${key === todayKey ? " today" : ""}${isFuture ? " is-future" : ""}${isOutside ? " is-outside" : ""}" title="${title}" aria-label="${title}"></span>`
       );
       cursor = addDays(cursor, 1);
     }
   }
 
+  heatmapMonths.style.setProperty("--heatmap-weeks", String(totalWeeks));
+  journalHeatmap.style.setProperty("--heatmap-weeks", String(totalWeeks));
+  if (heatmapRangeText) {
+    heatmapRangeText.textContent = `${formatYmd(range.visibleStart)} ~ ${formatYmd(range.visibleEnd)}`;
+  }
   heatmapMonths.innerHTML = monthMarkers.join("");
   journalHeatmap.innerHTML = cells.join("");
 }
@@ -1799,10 +2921,12 @@ function renderJournalHeatmap() {
 function renderJournalFilters() {
   journalFilters.innerHTML = allTags()
     .map(
-      (tag) =>
-        `<button class="filter-chip${tag === currentFilter ? " is-active" : ""}" type="button" data-filter="${escapeHtml(
+      (tag) => {
+        const key = philosopherKeyByName(tag);
+        return `<button class="filter-chip${key ? ` tone-${key}` : " tone-all"}${tag === currentFilter ? " is-active" : ""}" type="button" data-filter="${escapeHtml(
           tag
-        )}">${escapeHtml(tag)}</button>`
+        )}">${escapeHtml(tag)}</button>`;
+      }
     )
     .join("");
 }
@@ -1828,33 +2952,54 @@ function renderJournalList() {
   const totalPages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
   currentPage = Math.min(currentPage, totalPages);
   const pageItems = list.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const latestInfo = latestMarkerInfo();
 
   journalList.innerHTML = pageItems
     .map((entry) => {
       const isCurrent = entry.id === currentEntryId;
+      const isLatest = latestInfo.latestTopTwoIds.has(entry.id);
+      const isLatestDay = latestInfo.latestDayIds.has(entry.id);
       const philosopher = philosopherCatalog[entry.philosophyKey];
-      const adminActions = isAdminUnlocked()
-        ? `
-          <div class="journal-admin-actions is-visible">
-            <button class="ghost-button" data-admin-action="edit-entry" data-entry-id="${entry.id}">수정</button>
-            <button class="ghost-button" data-admin-action="delete-entry" data-entry-id="${entry.id}">삭제</button>
-          </div>
-        `
-        : `<div class="journal-admin-actions"></div>`;
+      const summary = commentSummaryByEntry[entry.id] || {};
+      const commentCount = Number(summary.count || 0);
+      const latestComment = summary.latest || null;
+      const commentBody = latestComment?.body ? String(latestComment.body).slice(0, 48) : "아직 댓글 없음";
+      const commentPreview = `🙂 | ${latestComment?.nickname || "-"} | ${commentBody}${latestComment?.body && String(latestComment.body).length > 48 ? "..." : ""} | ${formatCommentStamp(latestComment?.createdAt)}`;
+      const critique = opposingCritique(entry);
+      const adminActions = `
+        <div class="journal-admin-actions is-visible">
+          <button class="ghost-button" data-admin-action="edit-entry" data-entry-id="${entry.id}">수정</button>
+          <button class="ghost-button" data-admin-action="delete-entry" data-entry-id="${entry.id}">삭제</button>
+        </div>
+      `;
       return `
-        <article class="journey-card tone-${entry.philosophyKey}${isCurrent ? " is-current" : ""}" data-entry-id="${entry.id}">
+        <article class="journey-card tone-${entry.philosophyKey}${isCurrent ? " is-current" : ""}${isLatest ? " is-recent-entry" : ""}${isLatestDay ? " is-latest-day" : ""}" data-entry-id="${entry.id}">
           <div class="journey-card-meta">
-            <span>${entry.date}</span>
-            ${entry.updatedAt === list[0]?.updatedAt ? '<span class="mini-update"><span class="recent-dot"></span>최근</span>' : ""}
+            <div class="journey-meta-left">
+              <span>${entry.date}</span>
+              <span class="journey-comment-chip"><span aria-hidden="true">💬</span> ${commentCount}</span>
+              <span class="philosopher-meta-chip tone-${entry.philosophyKey}">${escapeHtml(philosopherToneLabel(entry.philosophyKey))}</span>
+            </div>
+            <div class="journey-meta-right">
+              ${isLatest ? '<span class="latest-two-chip">LATEST</span>' : isLatestDay ? '<span class="latest-day-chip">당일 기록</span>' : ""}
+              ${isEntryPrivate(entry) ? '<span class="journal-lock-chip">LOCK 비공개</span>' : ""}
+            </div>
           </div>
           <div class="journey-card-stack">
             <h3>${escapeHtml(entry.title)}</h3>
             <p class="journey-card-excerpt">${escapeHtml(entry.excerpt)}</p>
-            <p class="journey-subcopy">${escapeHtml(philosopher.name)} · ${escapeHtml(entry.psychologyState)}</p>
+            <div class="opposing-roast">
+              <strong>${escapeHtml(critique.critic)}의 반대 시선</strong>
+              <p>${escapeHtml(critique.text)}</p>
+            </div>
+            <p class="journey-comment-preview">${escapeHtml(commentPreview)}</p>
           </div>
           <div class="journey-card-foot">
             <div class="tag-row">${entry.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>
-            ${adminActions}
+            <div class="journey-foot-right">
+              <span class="state-badge-inline">${escapeHtml(entry.psychologyState)}${isEntryPrivate(entry) ? " · 잠금 필요" : ""}</span>
+              ${adminActions}
+            </div>
           </div>
         </article>
       `;
@@ -1862,7 +3007,10 @@ function renderJournalList() {
     .join("");
 
   const latest = list[0];
-  recentUpdateText.textContent = latest ? `최근 업데이트 · ${latest.date} · ${latest.title}` : "최근 업데이트 없음";
+  const latestBatchCount = latestInfo.latestDate ? Number(latestInfo.latestDayIds.size || 0) : 0;
+  recentUpdateText.textContent = latest
+    ? `최근 업데이트 · ${latestInfo.latestDate || latest.date} · 당일 ${latestBatchCount}개 기록 (최신 2개 강조)`
+    : "최근 업데이트 없음";
   journalPagination.innerHTML = Array.from({ length: totalPages }, (_, index) => {
     const page = index + 1;
     return `<button class="page-chip${page === currentPage ? " is-active" : ""}" type="button" data-page="${page}">${page}</button>`;
@@ -1901,8 +3049,42 @@ function renderSpotlight(entry) {
   renderTags(spotlight.tags, [philosopher.name, ...entry.tags]);
 }
 
+function renderLockedEntryPreview(entry) {
+  const philosopher = philosopherCatalog[entry.philosophyKey];
+  currentEntryId = entry.id;
+  entryElements.title.textContent = `${entry.title} (비공개)`;
+  entryElements.date.textContent = entry.date;
+  entryElements.tag.textContent = "Private Journal Entry";
+  entryElements.themeChip.textContent = entry.tags[0] || "기록";
+  entryElements.philosophyChip.textContent = philosopher.name;
+  entryElements.body.innerHTML = `
+    <section class="entry-locked-view">
+      <p><strong>비공개 글입니다.</strong> 목록에서는 제목과 첫줄만 보이고, 본문은 비밀번호 입력 후 열 수 있습니다.</p>
+      <p class="helper-copy">${escapeHtml(entry.excerpt)}</p>
+    </section>
+  `;
+  entryElements.philosophyTitle.textContent = "비공개 설정 안내";
+  entryElements.philosophyText.textContent = "글 내용은 보호 중입니다. 작성 시 설정한 비밀번호를 입력하면 본문/댓글을 확인할 수 있습니다.";
+  entryElements.philosophyQuote.textContent = "";
+  entryElements.philosophyAdvice.textContent = "";
+  renderTags(entryElements.philosophyTags, ["비공개", philosopher.name]);
+  entryElements.psychologyTitle.textContent = "잠금 상태";
+  entryElements.psychologyText.textContent = "현재 본문은 숨김 처리되어 있습니다.";
+  entryElements.psychologyState.textContent = "비밀번호 필요";
+  renderTags(entryElements.psychologyTags, ["잠금", "비밀번호"]);
+  renderSpotlight(entry);
+  renderMetrics(entry.metrics, entry);
+  updateMap(entry);
+  renderRevisitPrompts(entry);
+  commentsUi.list.innerHTML = `<p class="helper-copy">비공개 글은 잠금 해제 후 댓글을 볼 수 있습니다.</p>`;
+}
+
 function renderEntry(entry) {
   if (!entry) return;
+  if (!canAccessEntry(entry)) {
+    renderLockedEntryPreview(entry);
+    return;
+  }
   const philosopher = philosopherCatalog[entry.philosophyKey];
   currentEntryId = entry.id;
   entryElements.title.textContent = entry.title;
@@ -1931,6 +3113,7 @@ function renderEntry(entry) {
 
 function renderReaderModal(entry) {
   if (!entry) return;
+  if (!canAccessEntry(entry)) return;
   const philosopher = philosopherCatalog[entry.philosophyKey];
   readerModal.title.textContent = entry.title;
   readerModal.date.textContent = entry.date;
@@ -2026,10 +3209,8 @@ function renderCognitiveLibrary() {
 
 function updateMap(entry) {
   const philosopher = philosopherCatalog[entry.philosophyKey];
-  mapCenterTitle.textContent = `${philosopher.name}형 닮은꼴`;
-  mapCenterText.textContent = `핵심 좌표: ${entry.tags.slice(0, 2).join(" · ")}`;
-  if (mapCoreWatermark) {
-    mapCoreWatermark.textContent = philosopher.name;
+  if (philosophyTypeChip) {
+    philosophyTypeChip.textContent = philosopher.name;
   }
   if (overlayFocusTitle) {
     overlayFocusTitle.textContent = philosopher.name;
@@ -2178,10 +3359,28 @@ const metricDefinitionsByLabel = Object.fromEntries(metricDefinitions.map((item)
 
 function renderMetrics(values, entry = null) {
   metricsList.innerHTML = "";
+  const normalized = values.map((value, index) => {
+    const metric = metricDefinitions[index];
+    return metric.polarity === "lower" ? 100 - value : value;
+  });
+  const totalScore = Math.round(normalized.reduce((sum, value) => sum + value, 0) / Math.max(1, normalized.length));
+
+  const summaryItem = document.createElement("div");
+  summaryItem.className = "metric-item metric-summary-item";
+  summaryItem.innerHTML = `
+    <div class="metric-topline">
+      <span class="metric-name">종합 총점</span>
+      <strong>${totalScore}</strong>
+    </div>
+    <p class="metric-description">현재 지표를 통합한 총점입니다. 낮은 항목을 먼저 보완하면 전체 균형이 가장 빠르게 올라갑니다.</p>
+    <div class="metric-bar"><span style="width:${totalScore}%"></span></div>
+  `;
+  metricsList.appendChild(summaryItem);
+
   values.forEach((value, index) => {
     const metric = metricDefinitions[index];
     const item = document.createElement("div");
-    item.className = "metric-item";
+    item.className = `metric-item metric-item-${index % 3}`;
     item.innerHTML = `
       <div class="metric-topline">
         <span class="metric-name">${metric.korean}</span>
@@ -2193,7 +3392,52 @@ function renderMetrics(values, entry = null) {
     metricsList.appendChild(item);
   });
 
+  if (hexOverallScoreValue) {
+    hexOverallScoreValue.textContent = String(totalScore);
+  }
+  if (hexOverallScoreCopy) {
+    hexOverallScoreCopy.textContent = totalScore < 50
+      ? "지금은 안전과 회복 리듬부터 붙이면 총점이 가장 빨리 올라옵니다."
+      : totalScore < 70
+      ? "관찰과 개입이 함께 필요한 구간입니다. 약한 축 1~2개를 우선 보완하세요."
+      : "균형이 안정화되는 흐름입니다. 지금의 루틴을 유지하며 미세 조정만 하면 됩니다.";
+  }
+
+  const oppositeMap = {
+    camus: "nietzsche",
+    nietzsche: "epictetus",
+    epictetus: "sartre",
+    sartre: "camus"
+  };
+  const philosophyProfiles = {
+    camus: [72, 59, 56, 54, 58, 47],
+    nietzsche: [66, 52, 63, 45, 72, 59],
+    epictetus: [69, 76, 64, 48, 66, 36],
+    sartre: [63, 49, 43, 62, 55, 66]
+  };
+  const myKey = entry?.philosophyKey || "camus";
   hexagonDataLarge.setAttribute("points", metricPoints(values, 220, 220, 124));
+  hexagonDataLarge.classList.remove("tone-camus", "tone-nietzsche", "tone-epictetus", "tone-sartre");
+  hexagonDataLarge.classList.add(`tone-${myKey}`);
+  const oppositeKey = oppositeMap[myKey] || "nietzsche";
+  const oppositeProfile = philosophyProfiles[oppositeKey] || philosophyProfiles.nietzsche;
+  const oppositeValues = values.map((value, index) => {
+    const mixed = Math.round(value * 0.35 + oppositeProfile[index] * 0.65);
+    return Math.max(18, Math.min(94, mixed));
+  });
+  if (hexagonDataOpposite) {
+    hexagonDataOpposite.setAttribute("points", metricPoints(oppositeValues, 220, 220, 124));
+    hexagonDataOpposite.classList.remove("tone-camus", "tone-nietzsche", "tone-epictetus", "tone-sartre");
+    hexagonDataOpposite.classList.add(`tone-${oppositeKey}`);
+  }
+  if (hexMapMine) {
+    const mineName = philosopherCatalog[myKey]?.name || "나의 철학자";
+    hexMapMine.textContent = `내 지도 · ${mineName}`;
+  }
+  if (hexMapOpposite) {
+    const oppositeName = philosopherCatalog[oppositeKey]?.name || "반대 철학자";
+    hexMapOpposite.textContent = `반대 지도 · ${oppositeName}`;
+  }
 
   const weakest = values
     .map((value, index) => {
@@ -2230,18 +3474,18 @@ function renderMetrics(values, entry = null) {
   const weakestHealth = lowest ? lowest.healthScore : 60;
   const riskLevel = entry?.riskLevel || "low";
   if (riskLevel === "critical" || riskLevel === "high" || weakestHealth < 35) {
-    hexConclusionTitle.textContent = "지금은 혼자 버티기보다 도움 연결이 우선입니다";
+    hexConclusionTitle.textContent = "종합 결론 · 즉시 회복 루틴과 외부 연결이 필요합니다";
     hexConclusionText.textContent =
       "철학 관점과 인지심리 지표를 함께 보면, 현재는 해석보다 안전과 회복 리듬을 먼저 붙이는 구간입니다. 가까운 사람·전문가·긴급 도움선 중 하나를 오늘 안에 연결하세요.";
     return;
   }
   if (riskLevel === "watch" || weakestHealth < 50) {
-    hexConclusionTitle.textContent = "가벼운 개입이 필요한 관찰 구간입니다";
+    hexConclusionTitle.textContent = "종합 결론 · 관찰 중심 + 저강도 개입이 필요한 구간입니다";
     hexConclusionText.textContent =
       "지금은 크게 밀어붙이기보다 수면·식사·연결 같은 기본 리듬을 먼저 맞추는 편이 좋습니다. 일주일 단위로 변화를 짧게 기록해 추세를 확인하세요.";
     return;
   }
-  hexConclusionTitle.textContent = "지금은 관찰 중심으로 충분합니다";
+  hexConclusionTitle.textContent = "종합 결론 · 현재 리듬 유지와 미세 조정이 적절합니다";
   hexConclusionText.textContent =
     "철학과 인지심리 관점을 합치면, 현재는 즉각 개입보다 현재 리듬을 유지하는 쪽이 더 적절합니다. 무리 없이 기록을 이어가며 변화만 체크하면 됩니다.";
 }
@@ -2340,8 +3584,15 @@ function createGeneratedEntry({ title, date, body, tags }) {
 function openModal() {
   modal.status.textContent = "";
   if (!modal.date.value) {
-    modal.date.value = new Date().toISOString().slice(0, 10);
+    modal.date.value = todayYmdSeoul();
   }
+  if (modal.privateToggle && !editingEntryId) {
+    modal.privateToggle.checked = false;
+  }
+  if (modal.privatePassword && !editingEntryId) {
+    modal.privatePassword.value = "";
+  }
+  syncPrivatePasswordFieldState();
   modal.shell.classList.remove("is-hidden");
   modal.shell.setAttribute("aria-hidden", "false");
 }
@@ -2351,6 +3602,9 @@ function closeModal() {
   modal.shell.setAttribute("aria-hidden", "true");
   editingEntryId = "";
   modal.createForm.dataset.mode = "create";
+  if (modal.privatePassword) modal.privatePassword.value = "";
+  if (modal.privateToggle) modal.privateToggle.checked = false;
+  syncPrivatePasswordFieldState();
 }
 
 function openAuthModal(statusText = "") {
@@ -2364,8 +3618,42 @@ function closeAuthModal() {
   authModal.shell.setAttribute("aria-hidden", "true");
 }
 
+function syncPrivatePasswordFieldState() {
+  if (!modal.privatePassword || !modal.privateToggle) return;
+  const enabled = modal.privateToggle.checked;
+  modal.privatePassword.disabled = !enabled;
+  if (!enabled) {
+    modal.privatePassword.value = "";
+  }
+}
+
+function openPrivateModal(entry) {
+  if (!entry) return;
+  pendingPrivateEntryId = entry.id;
+  privateModal.status.textContent = "";
+  if (privateModal.form) privateModal.form.reset();
+  privateModal.shell.classList.remove("is-hidden");
+  privateModal.shell.setAttribute("aria-hidden", "false");
+  if (privateModal.password) privateModal.password.focus();
+}
+
+function closePrivateModal() {
+  privateModal.shell.classList.add("is-hidden");
+  privateModal.shell.setAttribute("aria-hidden", "true");
+  pendingPrivateEntryId = "";
+}
+
+function promptPrivateAccess(entry) {
+  if (!entry) return false;
+  if (canAccessEntry(entry)) return true;
+  openPrivateModal(entry);
+  return false;
+}
+
 function openReaderModal(entry) {
   if (!entry) return;
+  if (!promptPrivateAccess(entry)) return;
+  currentReaderEntryId = entry.id;
   renderReaderModal(entry);
   readerModal.body.scrollTop = 0;
   readerModal.shell.classList.remove("is-hidden");
@@ -2378,14 +3666,75 @@ function openReaderModal(entry) {
 function closeReaderModal() {
   readerModal.shell.classList.add("is-hidden");
   readerModal.shell.setAttribute("aria-hidden", "true");
+  currentReaderEntryId = "";
 }
 
 async function fetchComments() {
   return fetchCommentsInto(commentsUi);
 }
 
+async function fetchCommentCounts() {
+  const response = await fetch("/api/comments?summary=1");
+  const payload = await response.json();
+  if (!payload?.ok || !payload.summary || typeof payload.summary !== "object") return;
+  commentSummaryByEntry = payload.summary;
+  renderJournalList();
+}
+
+function entryForComments(targetUi) {
+  if (targetUi === readerModal && currentReaderEntryId) {
+    return entries.find((item) => item.id === currentReaderEntryId) || currentEntry();
+  }
+  return currentEntry();
+}
+
+function commentInitials(name = "") {
+  return String(name || "")
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0] || "")
+    .join("")
+    .toUpperCase() || "•";
+}
+
+function renderCommentItem(comment) {
+  return `
+    <article class="comment-item" data-comment-id="${comment.id}">
+      <div class="comment-avatar" aria-hidden="true">${escapeHtml(commentInitials(comment.nickname))}</div>
+      <div class="comment-main">
+        <div class="comment-bubble">
+          <div class="comment-meta">
+            <strong class="comment-author">${escapeHtml(comment.nickname)}</strong>
+            <span class="comment-date">${new Date(comment.createdAt).toLocaleString("ko-KR")}</span>
+          </div>
+          <p class="comment-body">${escapeHtml(comment.body)}</p>
+        </div>
+        <div class="comment-delete-row">
+          <button class="ghost-button" data-action="delete-comment" data-comment-id="${comment.id}">삭제</button>
+        </div>
+        <div class="comment-delete-inline is-hidden">
+          <label class="field comment-delete-password">
+            <span>삭제 비밀번호</span>
+            <input
+              type="password"
+              maxlength="64"
+              placeholder="본인 비밀번호 또는 관리자 키"
+              data-role="delete-password"
+            />
+          </label>
+          <div class="comment-delete-inline-actions">
+            <button class="ghost-button strong" data-action="confirm-delete-comment" data-comment-id="${comment.id}">삭제 확인</button>
+            <button class="ghost-button" data-action="cancel-delete-comment">취소</button>
+          </div>
+        </div>
+      </div>
+    </article>
+  `;
+}
+
 async function fetchCommentsInto(targetUi) {
-  const entry = currentEntry();
+  const entry = entryForComments(targetUi);
   if (!entry) {
     targetUi.list ? (targetUi.list.innerHTML = "") : (targetUi.commentsList.innerHTML = "");
     return;
@@ -2396,9 +3745,26 @@ async function fetchCommentsInto(targetUi) {
   const listEl = targetUi.list || targetUi.commentsList;
 
   if (!payload.ok) {
-    listEl.innerHTML = `<p class="helper-copy">댓글을 불러오지 못했습니다.</p>`;
+    listEl.innerHTML = `<p class="helper-copy">${payload.error === "private entry locked" ? "비공개 글은 잠금 해제 후 댓글을 볼 수 있습니다." : "댓글을 불러오지 못했습니다."}</p>`;
     applyCommentAnalysis(currentEntry(), []);
     return;
+  }
+
+  const previousCount = Number(commentSummaryByEntry[entry.id]?.count || 0);
+  const latestCount = Array.isArray(payload.comments) ? payload.comments.length : 0;
+  const latest = latestCount ? payload.comments[latestCount - 1] : null;
+  commentSummaryByEntry[entry.id] = {
+    count: latestCount,
+    latest: latest
+      ? {
+          nickname: latest.nickname || "",
+          body: latest.body || "",
+          createdAt: latest.createdAt || ""
+        }
+      : null
+  };
+  if (latestCount !== previousCount) {
+    renderJournalList();
   }
 
   if (!payload.comments.length) {
@@ -2407,23 +3773,7 @@ async function fetchCommentsInto(targetUi) {
     return;
   }
 
-  listEl.innerHTML = payload.comments
-    .map(
-      (comment) => `
-        <article class="comment-item" data-comment-id="${comment.id}">
-          <div class="comment-meta">
-            <strong class="comment-author">${escapeHtml(comment.nickname)}</strong>
-            <span class="comment-date">${new Date(comment.createdAt).toLocaleString("ko-KR")}</span>
-          </div>
-          <p class="comment-body">${escapeHtml(comment.body)}</p>
-          <div class="comment-delete-row">
-            <input class="comment-delete-password" type="password" maxlength="64" placeholder="댓글 비밀번호" />
-            <button class="ghost-button" data-action="delete-comment" data-comment-id="${comment.id}">삭제</button>
-          </div>
-        </article>
-      `
-    )
-    .join("");
+  listEl.innerHTML = payload.comments.map((comment) => renderCommentItem(comment)).join("");
   applyCommentAnalysis(entry, payload.comments);
 }
 
@@ -2440,14 +3790,27 @@ async function createComment(event) {
 
 async function createCommentFromUi(event, targetUi) {
   event.preventDefault();
-  const entry = currentEntry();
+  const entry = entryForComments(targetUi);
+  const statusEl = targetUi.status || targetUi.commentStatus;
+  if (!entry?.id) {
+    statusEl.textContent = "댓글을 연결할 기록을 찾지 못했습니다. 페이지를 새로고침해 주세요.";
+    return;
+  }
+  const formEl = event.currentTarget;
+  const formData = formEl ? new FormData(formEl) : null;
+  const nicknameField = targetUi.nickname || targetUi.commentNickname;
+  const passwordField = targetUi.password || targetUi.commentPassword;
+  const bodyField = targetUi.body || targetUi.commentBody;
   const payload = {
     entryKey: entry.id,
-    nickname: (targetUi.nickname || targetUi.commentNickname).value,
-    password: (targetUi.password || targetUi.commentPassword).value,
-    body: (targetUi.body || targetUi.commentBody).value
+    nickname: String(formData?.get("nickname") || nicknameField?.value || "").trim(),
+    password: String(formData?.get("password") || passwordField?.value || "").trim(),
+    body: String(formData?.get("body") || bodyField?.value || "").trim()
   };
-  const statusEl = targetUi.status || targetUi.commentStatus;
+  if (!payload.nickname || !payload.password || !payload.body) {
+    statusEl.textContent = "닉네임, 비밀번호, 댓글 본문을 모두 입력해 주세요.";
+    return;
+  }
   localStorage.setItem(MY_COMMENT_NICKNAME_KEY, payload.nickname);
 
   statusEl.textContent = "등록 중...";
@@ -2464,9 +3827,27 @@ async function createCommentFromUi(event, targetUi) {
     return;
   }
 
-  (targetUi.body || targetUi.commentBody).value = "";
+  if (formEl && typeof formEl.reset === "function") {
+    formEl.reset();
+  } else {
+    if (nicknameField) nicknameField.value = "";
+    if (passwordField) passwordField.value = "";
+    if (bodyField) bodyField.value = "";
+  }
+
+  const listEl = targetUi.list || targetUi.commentsList;
+  if (listEl && result.comment) {
+    const isEmptyState = /아직 댓글이 없습니다/.test(listEl.textContent || "");
+    if (isEmptyState) {
+      listEl.innerHTML = "";
+    }
+    listEl.insertAdjacentHTML("beforeend", renderCommentItem(result.comment));
+  }
+
   statusEl.textContent = "댓글이 등록됐습니다.";
-  await fetchCommentsInto(targetUi);
+  fetchCommentsInto(targetUi).catch(() => {
+    statusEl.textContent = "등록은 완료됐지만 목록 새로고침 중 오류가 발생했습니다.";
+  });
 }
 
 async function deleteComment(commentId, password) {
@@ -2474,16 +3855,16 @@ async function deleteComment(commentId, password) {
 }
 
 async function deleteCommentFromUi(commentId, password, targetUi) {
+  const statusEl = targetUi.status || targetUi.commentStatus;
+  statusEl.textContent = "삭제 중...";
   const response = await fetch("/api/comments", {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       commentId,
-      password,
-      adminKey: (targetUi.adminDeleteKey || commentsUi.adminDeleteKey).value
+      password
     })
   });
-  const statusEl = targetUi.status || targetUi.commentStatus;
 
   const result = await response.json();
   if (!result.ok) {
@@ -2521,6 +3902,14 @@ function openEditForCurrentEntry() {
   modal.createForm.dataset.mode = "edit";
   modal.title.value = entry.title;
   modal.date.value = entry.date;
+  if (modal.privateToggle) {
+    modal.privateToggle.checked = isEntryPrivate(entry);
+  }
+  if (modal.privatePassword) {
+    modal.privatePassword.value = "";
+    modal.privatePassword.placeholder = isEntryPrivate(entry) ? "변경 시에만 입력" : "비공개일 때만 입력";
+  }
+  syncPrivatePasswordFieldState();
   modal.body.value = entry.body.join("\n\n");
   if (entry.markdown) {
     modal.body.value = entry.markdown;
@@ -2529,9 +3918,11 @@ function openEditForCurrentEntry() {
   openModal();
 }
 
-function deleteCurrentEntry() {
+async function deleteCurrentEntry() {
   if (!isAdminUnlocked()) {
-    pendingPostAuthAction = () => deleteCurrentEntry();
+    pendingPostAuthAction = () => {
+      void deleteCurrentEntry();
+    };
     openAuthModal("삭제하려면 관리자 로그인이 필요합니다.");
     return;
   }
@@ -2543,8 +3934,13 @@ function deleteCurrentEntry() {
 
   entries = entries.filter((item) => item.id !== entry.id);
   saveEntries();
+  const synced = await syncEntriesToServer();
+  if (!synced) {
+    window.alert("서버 저장에 실패했습니다. 관리자 인증 상태를 다시 확인해 주세요.");
+    return;
+  }
+  await refreshEntriesFromServer();
   currentEntryId = visibleEntries()[0]?.id || entries[0]?.id || "";
-  rerenderAll();
   window.location.hash = "journal";
 }
 
@@ -2553,10 +3949,34 @@ function handleHashRoute() {
   setRoute(route);
 }
 
-entries = normalizeEntryDatesForUserRequest(loadEntries());
-currentEntryId = entries[0]?.id || "";
-rerenderAll();
+async function bootstrapEntries() {
+  entries = mergeEntriesByPriority(defaultEntries, loadEntries());
+  currentEntryId = entries[0]?.id || "";
+  rerenderAll();
+  void fetchCommentCounts();
+
+  const serverEntries = await fetchServerEntries();
+  if (!serverEntries) return;
+
+  entries = mergeEntriesByPriority(defaultEntries, serverEntries);
+  currentEntryId = entries.find((entry) => entry.id === currentEntryId)?.id || entries[0]?.id || "";
+  rerenderAll();
+  void fetchCommentCounts();
+}
+
 handleHashRoute();
+void bootstrapEntries();
+void fetchAdminAccess().then((access) => {
+  adminAccess = access;
+});
+void fetchChatArchiveAccess().then(async (access) => {
+  chatArchiveAccess = access;
+  applyChatArchiveVisibility();
+  handleHashRoute();
+  chatArchivePayload = await fetchChatArchivePayload();
+  renderChatArchive();
+});
+void trackVisitAndRenderCounter();
 
 window.addEventListener("hashchange", handleHashRoute);
 
@@ -2617,12 +4037,14 @@ modal.openButtons.forEach((button) => {
     if (isAdminUnlocked()) {
       editingEntryId = "";
       modal.createForm.reset();
+      if (modal.privatePassword) modal.privatePassword.placeholder = "비공개일 때만 입력";
       openModal();
       return;
     }
     pendingPostAuthAction = () => {
       editingEntryId = "";
       modal.createForm.reset();
+      if (modal.privatePassword) modal.privatePassword.placeholder = "비공개일 때만 입력";
       openModal();
     };
     openAuthModal("새 글을 쓰려면 관리자 로그인이 필요합니다.");
@@ -2633,8 +4055,21 @@ modal.closeButtons.forEach((button) => {
   button.addEventListener("click", closeModal);
 });
 
+if (modal.privateToggle) {
+  modal.privateToggle.addEventListener("change", () => {
+    syncPrivatePasswordFieldState();
+    if (modal.privateToggle.checked && modal.privatePassword) {
+      modal.privatePassword.focus();
+    }
+  });
+}
+
 authModal.closeButtons.forEach((button) => {
   button.addEventListener("click", closeAuthModal);
+});
+
+privateModal.closeButtons.forEach((button) => {
+  button.addEventListener("click", closePrivateModal);
 });
 
 readerModal.closeButtons.forEach((button) => {
@@ -2643,23 +4078,79 @@ readerModal.closeButtons.forEach((button) => {
 
 authModal.form.addEventListener("submit", (event) => {
   event.preventDefault();
-  const id = authModal.id.value.trim();
-  const password = authModal.password.value.trim();
-  if ((id === "" || id === ADMIN_ID) && password === ADMIN_PASSWORD) {
-    sessionStorage.setItem(ADMIN_SESSION_KEY, "true");
-    authModal.status.textContent = "로그인 완료. 세션이 유지됩니다.";
-    closeAuthModal();
-    if (typeof pendingPostAuthAction === "function") {
-      const action = pendingPostAuthAction;
-      pendingPostAuthAction = null;
-      action();
+  void (async () => {
+    const id = authModal.id.value.trim();
+    const password = authModal.password.value.trim();
+    authModal.status.textContent = "확인 중...";
+    try {
+      const response = await fetch("/api/admin/unlock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, password })
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok || !payload?.ok) {
+        authModal.status.textContent = "관리자 정보가 맞지 않습니다.";
+        return;
+      }
+      adminAccess = { canAccess: true, configured: true };
+      authModal.status.textContent = "로그인 완료. 이 브라우저에서 유지됩니다.";
+      closeAuthModal();
+      if (typeof pendingPostAuthAction === "function") {
+        const action = pendingPostAuthAction;
+        pendingPostAuthAction = null;
+        action();
+      }
+    } catch {
+      authModal.status.textContent = "관리자 인증 중 오류가 발생했습니다.";
     }
-    return;
-  }
-  authModal.status.textContent = "관리자 정보가 맞지 않습니다.";
+  })();
 });
 
-modal.createForm.addEventListener("submit", (event) => {
+if (privateModal.form) {
+  privateModal.form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const target = entries.find((entry) => entry.id === pendingPrivateEntryId);
+    if (!target || !isEntryPrivate(target)) {
+      privateModal.status.textContent = "비공개 기록을 찾지 못했습니다.";
+      return;
+    }
+
+    const entered = String(privateModal.password?.value || "").trim();
+    if (!entered) {
+      privateModal.status.textContent = "비밀번호를 입력해 주세요.";
+      return;
+    }
+
+    privateModal.status.textContent = "확인 중...";
+    try {
+      const response = await fetch("/api/entries/unlock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ entryId: target.id, password: entered })
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok || !payload?.ok || !payload.entry) {
+        privateModal.status.textContent = "비밀번호가 일치하지 않습니다.";
+        return;
+      }
+      const normalized = normalizeStoredEntry(payload.entry);
+      if (normalized) {
+        entries = entries.map((entry) => (entry.id === normalized.id ? normalized : entry));
+      }
+      unlockedPrivateEntryIds.add(target.id);
+      closePrivateModal();
+      const refreshedTarget = entries.find((entry) => entry.id === target.id) || target;
+      renderEntry(refreshedTarget);
+      openReaderModal(refreshedTarget);
+    } catch {
+      privateModal.status.textContent = "잠금 해제 중 오류가 발생했습니다.";
+      return;
+    }
+  });
+}
+
+modal.createForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   if (!isAdminUnlocked()) {
     modal.status.textContent = "먼저 관리자 확인이 필요합니다.";
@@ -2667,10 +4158,12 @@ modal.createForm.addEventListener("submit", (event) => {
   }
 
   const titleInput = modal.title.value.trim();
-  const date = modal.date.value || new Date().toISOString().slice(0, 10);
+  const date = modal.date.value || todayYmdSeoul();
   const body = modal.body.value.trim();
   const tags = inferTagsFromBody(body);
   const title = titleInput || autoTitleFromBody(body);
+  const wantsPrivate = Boolean(modal.privateToggle?.checked);
+  const privatePassword = String(modal.privatePassword?.value || "").trim();
 
   if (!body) {
     modal.status.textContent = "본문을 입력해 주세요.";
@@ -2681,19 +4174,43 @@ modal.createForm.addEventListener("submit", (event) => {
   }
 
   const newEntry = createGeneratedEntry({ title, date, body, tags });
+  const editingEntry = editingEntryId ? entries.find((entry) => entry.id === editingEntryId) : null;
+  if (wantsPrivate) {
+    if (!privatePassword && !(editingEntry && isEntryPrivate(editingEntry))) {
+      modal.status.textContent = "비공개 글은 비밀번호를 입력해야 저장됩니다.";
+      return;
+    }
+    newEntry.isPrivate = true;
+    newEntry.isLocked = false;
+    if (privatePassword) {
+      newEntry.privatePassword = privatePassword;
+    }
+  } else {
+    newEntry.isPrivate = false;
+    newEntry.isLocked = false;
+  }
+
   if (editingEntryId) {
     const index = entries.findIndex((entry) => entry.id === editingEntryId);
     if (index !== -1) {
       newEntry.id = editingEntryId;
       entries[index] = newEntry;
       currentEntryId = editingEntryId;
+      if (!newEntry.isPrivate) {
+        unlockedPrivateEntryIds.delete(newEntry.id);
+      }
     }
   } else {
     entries.unshift(newEntry);
     currentEntryId = newEntry.id;
   }
   saveEntries();
-  rerenderAll();
+  const synced = await syncEntriesToServer();
+  if (!synced) {
+    modal.status.textContent = "서버 저장에 실패했습니다. 관리자 인증 상태를 다시 확인해 주세요.";
+    return;
+  }
+  await refreshEntriesFromServer();
   modal.createForm.reset();
   modal.status.textContent = editingEntryId ? "기록이 수정됐습니다." : "새 기록이 저장됐습니다.";
   closeModal();
@@ -2761,9 +4278,25 @@ if (philoMbti.dislikeChecklist) {
 if (philoMbti.restartButton) {
   philoMbti.restartButton.addEventListener("click", () => {
     philosophyMbtiState = createPhilosophyMbtiState();
+    clearSavedPhilosophyMbtiResult();
     activePhilosophyConceptId = "";
     selectedPhilosophyDislikes.clear();
+    if (philoMbti.browsePanel) philoMbti.browsePanel.classList.add("is-hidden");
     renderPhilosophyMbti();
+  });
+}
+
+if (philoMbti.browsePrev) {
+  philoMbti.browsePrev.addEventListener("click", () => {
+    philosophyBrowseIndex -= 1;
+    renderPhilosophyBrowsePanel();
+  });
+}
+
+if (philoMbti.browseNext) {
+  philoMbti.browseNext.addEventListener("click", () => {
+    philosophyBrowseIndex += 1;
+    renderPhilosophyBrowsePanel();
   });
 }
 
@@ -2792,11 +4325,44 @@ commentsUi.form.addEventListener("submit", (event) => {
 });
 
 commentsUi.list.addEventListener("click", (event) => {
-  const button = event.target.closest('[data-action="delete-comment"]');
-  if (!button) return;
-  const container = button.closest(".comment-item");
-  const passwordInput = container.querySelector(".comment-delete-password");
-  deleteComment(button.dataset.commentId, passwordInput.value).catch(() => {
+  const deleteButton = event.target.closest('[data-action="delete-comment"]');
+  if (deleteButton) {
+    const item = deleteButton.closest(".comment-item");
+    const inline = item?.querySelector(".comment-delete-inline");
+    if (inline) {
+      inline.classList.remove("is-hidden");
+      const passwordInput = inline.querySelector('[data-role="delete-password"]');
+      if (passwordInput) {
+        passwordInput.focus();
+      }
+    }
+    return;
+  }
+
+  const cancelButton = event.target.closest('[data-action="cancel-delete-comment"]');
+  if (cancelButton) {
+    const inline = cancelButton.closest(".comment-delete-inline");
+    if (inline) {
+      inline.classList.add("is-hidden");
+      const passwordInput = inline.querySelector('[data-role="delete-password"]');
+      if (passwordInput) {
+        passwordInput.value = "";
+      }
+    }
+    return;
+  }
+
+  const confirmButton = event.target.closest('[data-action="confirm-delete-comment"]');
+  if (!confirmButton) return;
+
+  const inline = confirmButton.closest(".comment-delete-inline");
+  const passwordInput = inline?.querySelector('[data-role="delete-password"]');
+  const entered = String(passwordInput?.value || "").trim();
+  if (!entered) {
+    commentsUi.status.textContent = "삭제 비밀번호를 입력해 주세요.";
+    return;
+  }
+  deleteComment(confirmButton.dataset.commentId, entered).catch(() => {
     commentsUi.status.textContent = "댓글 삭제 중 오류가 발생했습니다.";
   });
 });
@@ -2808,11 +4374,76 @@ readerModal.commentForm.addEventListener("submit", (event) => {
 });
 
 readerModal.commentsList.addEventListener("click", (event) => {
-  const button = event.target.closest('[data-action="delete-comment"]');
-  if (!button) return;
-  const container = button.closest(".comment-item");
-  const passwordInput = container.querySelector(".comment-delete-password");
-  deleteCommentFromUi(button.dataset.commentId, passwordInput.value, readerModal).catch(() => {
+  const deleteButton = event.target.closest('[data-action="delete-comment"]');
+  if (deleteButton) {
+    const item = deleteButton.closest(".comment-item");
+    const inline = item?.querySelector(".comment-delete-inline");
+    if (inline) {
+      inline.classList.remove("is-hidden");
+      const passwordInput = inline.querySelector('[data-role="delete-password"]');
+      if (passwordInput) {
+        passwordInput.focus();
+      }
+    }
+    return;
+  }
+
+  const cancelButton = event.target.closest('[data-action="cancel-delete-comment"]');
+  if (cancelButton) {
+    const inline = cancelButton.closest(".comment-delete-inline");
+    if (inline) {
+      inline.classList.add("is-hidden");
+      const passwordInput = inline.querySelector('[data-role="delete-password"]');
+      if (passwordInput) {
+        passwordInput.value = "";
+      }
+    }
+    return;
+  }
+
+  const confirmButton = event.target.closest('[data-action="confirm-delete-comment"]');
+  if (!confirmButton) return;
+
+  const inline = confirmButton.closest(".comment-delete-inline");
+  const passwordInput = inline?.querySelector('[data-role="delete-password"]');
+  const entered = String(passwordInput?.value || "").trim();
+  if (!entered) {
+    readerModal.commentStatus.textContent = "삭제 비밀번호를 입력해 주세요.";
+    return;
+  }
+  deleteCommentFromUi(confirmButton.dataset.commentId, entered, readerModal).catch(() => {
     readerModal.commentStatus.textContent = "댓글 삭제 중 오류가 발생했습니다.";
   });
 });
+
+function renderVisitCounter(counter) {
+  if (!visitCounterInline || !counter) return;
+  const compact = window.matchMedia("(max-width: 430px)").matches;
+  visitCounterInline.textContent = compact
+    ? `TODAY | ${Number(counter.today || 0)}\nTOTAL | ${Number(counter.total || 0)}`
+    : `TODAY | ${Number(counter.today || 0)} | TOTAL | ${Number(counter.total || 0)}`;
+}
+
+async function trackVisitAndRenderCounter() {
+  try {
+    const hit = await fetch("/api/analytics/visit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{}"
+    });
+    if (hit.ok) {
+      renderVisitCounter(await hit.json());
+      return;
+    }
+  } catch (_error) {
+    // Ignore hit errors.
+  }
+
+  try {
+    const response = await fetch("/api/analytics/counter");
+    if (!response.ok) return;
+    renderVisitCounter(await response.json());
+  } catch (_error) {
+    // Ignore read errors.
+  }
+}

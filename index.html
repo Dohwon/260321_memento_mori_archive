@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
@@ -24,12 +24,14 @@
 
       <nav class="nav-links" aria-label="Primary">
         <a data-route-link href="#journal">Journal</a>
+        <a data-route-link href="#chat-archive">Chat Archive</a>
         <a data-route-link href="#overlays">Overlay Library</a>
         <a data-route-link href="#hexagon">Hexagon Signal</a>
         <a data-route-link href="#philosophy-mbti">Philosophy MBTI</a>
       </nav>
 
       <div class="nav-actions">
+        <span id="visit-counter-inline" class="visit-counter-inline" aria-live="polite"></span>
         <button id="headerWriteButton" class="nav-chip nav-chip-strong" type="button">새 글 쓰기</button>
       </div>
     </header>
@@ -40,6 +42,10 @@
           <div>
             <p class="eyebrow">Journal Journey</p>
             <h1>기록의 여정</h1>
+            <div class="project-status-row" aria-label="project status">
+              <span class="state-badge project-status-pill is-complete">Completed Project</span>
+              <span class="state-badge project-status-pill is-live">운영 중</span>
+            </div>
             <p class="lead">
               여기서는 지나간 마음의 결을 천천히 다시 볼 수 있어요. 날짜와 태그를 따라가며, 그날의 기록이 어떤 철학과 어떤 생각의 흐름으로 이어졌는지 살펴보세요.
             </p>
@@ -51,10 +57,11 @@
             <div class="panel-heading">
               <div>
                 <p class="eyebrow">Writing Footprint</p>
-                <h3>지난 1년의 기록 밀도</h3>
+                <h3>기록 밀도</h3>
               </div>
             </div>
             <p class="note-copy">기록한 날의 흐름을 한눈에 보여주는 지도예요. 많이 쓴 날일수록 더 진하게 표시됩니다.</p>
+            <p id="heatmapRangeText" class="helper-copy"></p>
             <div class="heatmap-shell">
               <div id="heatmapMonths" class="heatmap-months"></div>
               <div class="heatmap-grid-wrap">
@@ -63,7 +70,7 @@
                   <span>수</span>
                   <span>금</span>
                 </div>
-                <div id="journalHeatmap" class="journal-heatmap" aria-label="지난 1년 기록 히트맵"></div>
+                <div id="journalHeatmap" class="journal-heatmap" aria-label="1년 기록 히트맵"></div>
               </div>
             </div>
           </article>
@@ -140,6 +147,35 @@
         </div>
       </section>
 
+      <section class="page" data-page="chat-archive">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">Uploaded Chat Archive</p>
+            <h1>업로드 대화 감정 아카이브</h1>
+            <p class="lead">
+              기존 저널과는 별도로, 업로드한 대화를 파일 순서 기준으로 다시 읽어 감정 진폭이 커지는 구간만 따로 묶어 놓은 화면이에요. 화자와 날짜는 완전하지 않아서, 추정 근거와 함께 보관합니다.
+            </p>
+          </div>
+        </div>
+
+        <div class="chat-archive-layout">
+          <aside id="chatArchiveSummary" class="paper-card chat-archive-summary">
+            <p class="helper-copy">업로드 대화 아카이브를 불러오는 중입니다.</p>
+          </aside>
+
+          <section class="chat-archive-board">
+            <article id="chatArchiveMethodology" class="paper-card chat-archive-methodology">
+              <p class="helper-copy">화자 추정과 분류 기준을 준비 중입니다.</p>
+            </article>
+            <div id="chatArchiveSegments" class="chat-archive-segments">
+              <article class="paper-card chat-segment-card">
+                <p class="helper-copy">세그먼트 데이터를 준비 중입니다.</p>
+              </article>
+            </div>
+          </section>
+        </div>
+      </section>
+
       <section class="page" data-page="entry">
         <div class="page-heading">
           <div>
@@ -195,21 +231,23 @@
                 </div>
               </div>
 
+              <div id="commentsList" class="comments-list"></div>
+
               <form id="commentForm" class="comment-form">
                 <div class="field-row compact-row">
                   <label class="field">
                     <span>닉네임</span>
-                    <input id="commentNickname" type="text" maxlength="32" placeholder="닉네임" />
+                    <input id="commentNickname" name="nickname" type="text" maxlength="32" placeholder="닉네임" />
                   </label>
                   <label class="field">
                     <span>비밀번호</span>
-                    <input id="commentPassword" type="password" maxlength="64" placeholder="댓글 비밀번호" />
+                    <input id="commentPassword" name="password" type="password" maxlength="64" placeholder="댓글 비밀번호" />
                   </label>
                 </div>
 
                 <label class="field">
                   <span>댓글</span>
-                  <textarea id="commentBody" class="comment-textarea" rows="3" maxlength="800" placeholder="이 기록을 읽고 떠오른 생각을 남겨보세요."></textarea>
+                  <textarea id="commentBody" name="body" class="comment-textarea" rows="3" maxlength="800" placeholder="이 기록을 읽고 떠오른 생각을 남겨보세요."></textarea>
                 </label>
 
                 <div class="comment-actions">
@@ -217,15 +255,6 @@
                   <p id="commentStatus" class="helper-copy"></p>
                 </div>
               </form>
-
-              <div class="admin-strip">
-                <label class="field admin-field">
-                  <span>관리자 삭제 키</span>
-                  <input id="adminDeleteKey" type="password" maxlength="128" placeholder="관리자만 입력" />
-                </label>
-              </div>
-
-              <div id="commentsList" class="comments-list"></div>
             </section>
           </section>
 
@@ -262,19 +291,16 @@
                 <p class="lead">
                   기록마다 붙은 철학자와 인지심리 레이어를 한 장의 지도로 모아, 지금 어떤 축 위에서 오래 머물고 있는지 보여줍니다.
                 </p>
-                <p id="philosophyTypeLine" class="philosophy-type-line">나만의 철학 유형: 질문을 오래 붙드는 실존형</p>
+                <p id="philosophyTypeLine" class="philosophy-type-line">
+                  나만의 철학 유형: 질문을 오래 붙드는 실존형
+                  <span id="philosophyTypeChip" class="philosophy-type-chip">장 폴 사르트르</span>
+                </p>
               </div>
             </div>
 
             <article class="paper-card overlay-map-shell">
               <div class="map-grid-backdrop" aria-hidden="true"></div>
-              <div class="map-core-floating map-profile-badge">
-                <p class="map-core-kicker">Philosophy Twin · MBTI</p>
-                <strong id="mapCenterTitle">지속과 자기이해</strong>
-                <span id="mapCenterText">자주 되돌아오는 중심 주제</span>
-              </div>
               <div class="philosophy-map atelier-map coordinate-map">
-                <div id="mapCoreWatermark" class="map-core-watermark" aria-hidden="true">Epictetus</div>
                 <div class="axis-label axis-x-left">내면으로 더 깊게</div>
                 <div class="axis-label axis-x-right">바깥을 더 해석함</div>
                 <div class="axis-label axis-y-top">버티기보다 확장</div>
@@ -337,6 +363,11 @@
 
         <div class="hexagon-layout compact-hex-layout">
           <section class="paper-card hero-hex-card compact-hero-card">
+            <div class="hex-overall-score">
+              <p class="eyebrow">Overall Existential Equilibrium</p>
+              <strong id="hexOverallScoreValue">68</strong>
+              <p id="hexOverallScoreCopy" class="note-copy">현재 점수는 관찰과 회복 사이의 균형 구간입니다.</p>
+            </div>
             <div class="panel-heading">
               <div>
                 <p class="eyebrow">Current Signal</p>
@@ -345,22 +376,32 @@
             </div>
 
             <div class="compact-hex-wrap">
-              <div class="hexagon-stage compact-stage">
-                <div class="hex-grid">
-                  <svg viewBox="0 0 440 440" aria-hidden="true">
-                    <polygon points="220,32 373,120 373,298 220,386 67,298 67,120" class="hex-grid-line"></polygon>
-                    <polygon points="220,88 327,150 327,272 220,334 113,272 113,150" class="hex-grid-line"></polygon>
-                    <polygon points="220,142 280,176 280,246 220,280 160,246 160,176" class="hex-grid-line"></polygon>
-                    <line x1="220" y1="32" x2="220" y2="386" class="hex-axis"></line>
-                    <line x1="67" y1="120" x2="373" y2="298" class="hex-axis"></line>
-                    <line x1="67" y1="298" x2="373" y2="120" class="hex-axis"></line>
-                  </svg>
+              <div class="hex-main-column">
+                <div class="hexagon-stage compact-stage">
+                  <div class="hex-grid">
+                    <svg viewBox="0 0 440 440" aria-hidden="true">
+                      <polygon points="220,32 373,120 373,298 220,386 67,298 67,120" class="hex-grid-line"></polygon>
+                      <polygon points="220,88 327,150 327,272 220,334 113,272 113,150" class="hex-grid-line"></polygon>
+                      <polygon points="220,142 280,176 280,246 220,280 160,246 160,176" class="hex-grid-line"></polygon>
+                      <line x1="220" y1="32" x2="220" y2="386" class="hex-axis"></line>
+                      <line x1="67" y1="120" x2="373" y2="298" class="hex-axis"></line>
+                      <line x1="67" y1="298" x2="373" y2="120" class="hex-axis"></line>
+                    </svg>
+                  </div>
+                  <div class="hex-data">
+                    <svg viewBox="0 0 440 440" aria-hidden="true">
+                      <polygon id="hexagonDataOpposite" points="220,104 310,162 292,266 220,310 146,270 132,172" class="hex-shape opposite tone-nietzsche"></polygon>
+                      <polygon id="hexagonDataLarge" points="220,96 330,154 304,282 220,328 126,278 114,164" class="hex-shape mine tone-camus"></polygon>
+                    </svg>
+                  </div>
                 </div>
-                <div class="hex-data">
-                  <svg viewBox="0 0 440 440" aria-hidden="true">
-                    <polygon id="hexagonDataLarge" points="220,96 330,154 304,282 220,328 126,278 114,164" class="hex-shape"></polygon>
-                  </svg>
+                <div class="hex-map-legend">
+                  <span id="hexMapMine" class="hex-map-chip mine">내 지도 · 알베르 카뮈</span>
+                  <span id="hexMapOpposite" class="hex-map-chip opposite">반대 지도 · 프리드리히 니체</span>
                 </div>
+                <p class="hex-opposite-note note-copy">
+                  반대 지도는 지금의 해석과 충돌하는 철학자의 시선을 겹쳐 보여줍니다. 같은 데이터를 다른 관점으로 읽어, 놓친 맹점과 보완 방향을 더 빨리 찾기 위한 기준선입니다.
+                </p>
               </div>
 
               <div class="hex-copy-panel">
@@ -369,7 +410,7 @@
                 <div id="hexWeaknessKorean" class="hex-copy-korean"></div>
                 <p class="hex-copy-title">가볍게 올려볼 방향</p>
                 <p id="hexAdvice" class="note-copy"></p>
-                <article class="hex-conclusion-card">
+                <article class="hex-conclusion-card hex-final-summary">
                   <p class="eyebrow">Integrated Conclusion</p>
                   <h4 id="hexConclusionTitle">지금은 관찰 중심으로 충분해요</h4>
                   <p id="hexConclusionText" class="note-copy">
@@ -395,45 +436,63 @@
             <p class="eyebrow">Philosophy MBTI</p>
             <h1>질문을 고르며 닮은 철학자 찾기</h1>
             <p class="lead">
-              서로 대비되는 주장 중 더 가까운 쪽을 고르면 토너먼트로 철학 성향을 좁혀갑니다. 결과가 마음에 들지 않으면, 어떤 점이 불편했는지 체크하고 대응 관점을 함께 볼 수 있어요.
+              문항 선택 흐름을 따라가며 내 사고 경로와 가장 가까운 철학자를 찾습니다. 결과가 마음에 들지 않으면, 불편한 지점을 체크해 보정 해석을 확인할 수 있어요.
             </p>
           </div>
         </div>
 
         <div class="mbti-lab">
-          <section class="paper-card mbti-quiz-card">
+          <section id="philoQuestionSection" class="paper-card mbti-quiz-card">
             <div class="panel-heading">
               <div>
                 <p class="eyebrow">Question Arena</p>
-                <h3 id="philoMbtiPrompt">더 가까운 주장 하나를 골라주세요</h3>
+                <h3 id="philoMbtiPrompt">질문에 가장 가까운 선택지를 골라주세요</h3>
               </div>
-              <span id="philoMbtiProgress" class="date-pill">0 / 15</span>
+              <span id="philoMbtiProgress" class="date-pill">Question 1 / 20</span>
             </div>
             <div class="mbti-progress-track" aria-hidden="true">
               <span id="philoMbtiProgressBar" class="mbti-progress-bar"></span>
             </div>
-            <div class="mbti-versus-grid">
+            <div id="philoOptionGrid" class="mbti-versus-grid">
               <button id="philoOptionA" class="mbti-choice-card" type="button"></button>
               <button id="philoOptionB" class="mbti-choice-card" type="button"></button>
             </div>
           </section>
 
-          <section class="paper-card mbti-result-card">
-            <div class="mbti-result-head">
-              <img id="philoResultImage" class="mbti-result-image" alt="선택된 철학자" />
+          <section id="philoBrowsePanel" class="paper-card mbti-browse-panel is-hidden">
+            <div class="panel-heading">
               <div>
-                <p class="eyebrow">Current Match</p>
-                <h3 id="philoResultName">아직 결과가 정해지지 않았어요</h3>
-                <p id="philoResultMeta" class="note-copy">토너먼트를 진행하면 여기에 닮은 철학자가 나타납니다.</p>
+                <p class="eyebrow">Philosopher Directory</p>
+                <h3 id="philoBrowseName">전체 철학자 보기</h3>
+              </div>
+              <div class="mbti-browse-controls">
+                <div class="mbti-browse-nav">
+                  <button id="philoBrowsePrev" class="nav-arrow" type="button" aria-label="이전 철학자">←</button>
+                  <button id="philoBrowseNext" class="nav-arrow" type="button" aria-label="다음 철학자">→</button>
+                </div>
               </div>
             </div>
-            <blockquote id="philoResultQuote" class="inline-quote compact-overlay-quote"></blockquote>
-            <div class="mbti-result-actions">
-              <button id="philoRestartButton" class="ghost-button" type="button">다시 테스트</button>
+            <div class="mbti-browse-layout">
+              <img id="philoBrowseImage" class="mbti-browse-image" alt="철학자 이미지" />
+              <div class="mbti-browse-copy">
+                <p id="philoBrowseSchool" class="eyebrow"></p>
+                <blockquote id="philoBrowseQuote" class="inline-quote"></blockquote>
+                <p id="philoBrowseAngle" class="note-copy"></p>
+              </div>
+              <aside class="mbti-type-chart-card" aria-live="polite">
+                <p class="eyebrow">Type Landscape</p>
+                <h4>전체 유형 분포 그래프</h4>
+                <p class="mbti-type-chart-note">상단일수록 공개 연구에서 영향도가 높게 나타난 유형입니다.</p>
+                <p id="philoTypeInsight" class="mbti-type-insight"></p>
+                <div id="philoTypeChart" class="mbti-type-chart"></div>
+              </aside>
+            </div>
+            <div class="mbti-browse-footer">
+              <button id="philoRestartButton" class="primary-button mbti-restart-cta" type="button">검사 다시 시작</button>
             </div>
           </section>
 
-          <div class="mbti-bottom-grid">
+          <div id="philoBottomGrid" class="mbti-bottom-grid is-hidden">
             <section class="paper-card mbti-checklist-card">
               <div class="panel-heading">
                 <div>
@@ -491,6 +550,20 @@
             </div>
           </header>
 
+          <section class="compose-privacy">
+            <label class="privacy-toggle" for="modalPrivateToggle">
+              <input id="modalPrivateToggle" type="checkbox" />
+              <span class="privacy-toggle-text">
+                <strong>비공개 글로 저장</strong>
+                <small>목록에서는 제목/첫줄이 보이고, 본문은 비밀번호 입력 후 열립니다.</small>
+              </span>
+            </label>
+            <label class="field privacy-password-field">
+              <span>비공개 비밀번호</span>
+              <input id="modalPrivatePasswordInput" type="password" maxlength="64" placeholder="비공개일 때만 입력" disabled />
+            </label>
+          </section>
+
           <div class="compose-body-layout">
             <main class="compose-canvas">
               <label class="field">
@@ -538,6 +611,33 @@
       </section>
     </div>
 
+    <div id="privateEntryModal" class="modal-shell is-hidden" aria-hidden="true">
+      <div class="modal-backdrop" data-close-private-modal></div>
+      <section class="modal-card private-modal-card">
+        <div class="modal-head">
+          <div>
+            <p class="eyebrow">Private Record</p>
+            <h2>비공개 기록</h2>
+          </div>
+          <button class="nav-icon" type="button" data-close-private-modal aria-label="Close">×</button>
+        </div>
+        <div class="private-modal-body">
+          <p class="helper-copy">관리자에 의해 비공개로 설정된 기록입니다. 비밀번호를 입력하면 본문을 열 수 있습니다.</p>
+          <form id="privateEntryUnlockForm" class="modal-auth">
+            <label class="field">
+              <span>비밀번호</span>
+              <input id="privateEntryPasswordInput" type="password" maxlength="64" placeholder="비공개 비밀번호" />
+            </label>
+            <div class="comment-actions">
+              <button type="submit" class="ghost-button strong">본문 열기</button>
+              <button type="button" class="ghost-button" data-close-private-modal>목록으로</button>
+            </div>
+            <p id="privateEntryStatus" class="helper-copy"></p>
+          </form>
+        </div>
+      </section>
+    </div>
+
     <div id="readerModal" class="modal-shell is-hidden" aria-hidden="true">
       <div class="modal-backdrop" data-close-reader-modal></div>
       <section class="modal-card reader-modal-card">
@@ -566,21 +666,23 @@
                 </div>
               </div>
 
+              <div id="readerCommentsList" class="comments-list"></div>
+
               <form id="readerCommentForm" class="comment-form">
                 <div class="field-row compact-row">
                   <label class="field">
                     <span>닉네임</span>
-                    <input id="readerCommentNickname" type="text" maxlength="32" placeholder="닉네임" />
+                    <input id="readerCommentNickname" name="nickname" type="text" maxlength="32" placeholder="닉네임" />
                   </label>
                   <label class="field">
                     <span>비밀번호</span>
-                    <input id="readerCommentPassword" type="password" maxlength="64" placeholder="댓글 비밀번호" />
+                    <input id="readerCommentPassword" name="password" type="password" maxlength="64" placeholder="댓글 비밀번호" />
                   </label>
                 </div>
 
                 <label class="field">
                   <span>댓글</span>
-                  <textarea id="readerCommentBody" class="comment-textarea" rows="3" maxlength="800" placeholder="이 기록을 읽고 떠오른 생각을 남겨보세요."></textarea>
+                  <textarea id="readerCommentBody" name="body" class="comment-textarea" rows="3" maxlength="800" placeholder="이 기록을 읽고 떠오른 생각을 남겨보세요."></textarea>
                 </label>
 
                 <div class="comment-actions">
@@ -588,15 +690,6 @@
                   <p id="readerCommentStatus" class="helper-copy"></p>
                 </div>
               </form>
-
-              <div class="admin-strip">
-                <label class="field admin-field">
-                  <span>관리자 삭제 키</span>
-                  <input id="readerAdminDeleteKey" type="password" maxlength="128" placeholder="관리자만 입력" />
-                </label>
-              </div>
-
-              <div id="readerCommentsList" class="comments-list"></div>
             </section>
           </section>
 
